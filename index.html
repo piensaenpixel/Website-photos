@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Piensa en Pixel — Fotografía</title>
+  <meta name="description" content="Fotografía de paisaje, luna, dron y nocturna. Copias de edición limitada disponibles.">
+  <meta name="theme-color" content="#0b0b0c">
+  <meta property="og:title" content="Piensa en Pixel — Fotografía">
+  <meta property="og:description" content="Fotografía de paisaje, luna, dron y nocturna.">
+  <meta property="og:image" content="img/fotos/paisaje_1.jpg">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Karla:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="site-header" id="site-header">
+    <a class="brand" href="#/" aria-label="Inicio">
+      <span class="brand__mark" aria-hidden="true"></span>
+      <span class="brand__name">Piensa en Pixel</span>
+    </a>
+    <nav class="nav" aria-label="Principal">
+      <a href="#/galeria/paisaje" data-nav="paisaje">Paisaje</a>
+      <a href="#/galeria/luna" data-nav="luna">Luna</a>
+      <a href="#/galeria/drone" data-nav="drone">Drone</a>
+      <a href="#/galeria/nocturnas" data-nav="nocturnas">Nocturnas</a>
+      <span class="nav__sep" aria-hidden="true"></span>
+      <a href="#/sobre-mi" data-nav="sobre-mi">Sobre mí</a>
+      <a href="#/contacto" data-nav="contacto">Contacto</a>
+    </nav>
+    <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+      <span></span><span></span>
+    </button>
+  </header>
+
+  <div class="menu" id="menu" hidden>
+    <nav aria-label="Menú móvil">
+      <a href="#/galeria/paisaje"><small>01</small>Paisaje</a>
+      <a href="#/galeria/luna"><small>02</small>Luna</a>
+      <a href="#/galeria/drone"><small>03</small>Drone</a>
+      <a href="#/galeria/nocturnas"><small>04</small>Nocturnas</a>
+      <a href="#/sobre-mi" class="menu__minor">Sobre mí</a>
+      <a href="#/contacto" class="menu__minor">Contacto</a>
+    </nav>
+  </div>
+
+  <main id="app" class="app" tabindex="-1"></main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p class="site-footer__name">Piensa en Pixel</p>
+      <p class="site-footer__links">
+        <a href="https://www.instagram.com/piensaenpixel/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://unsplash.com/@piensaenpixel" target="_blank" rel="noopener">Unsplash</a>
+        <a href="#/contacto">Contacto</a>
+      </p>
+      <p class="site-footer__legal">© <span id="year"></span> Piensa en Pixel · Todas las imágenes están protegidas por derechos de autor.</p>
+    </div>
+  </footer>
+
+  <noscript><p class="noscript">Esta web necesita JavaScript para mostrar la galería.</p></noscript>
+
+  <script src="js/photos.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
