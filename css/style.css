@@ -29,16 +29,6 @@
   --fill: #1a1a1a;
   color-scheme: dark;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #000000;
-    --ink: #ffffff;
-    --muted: #8a8a8a;
-    --line: #2e2e2e;
-    --fill: #1a1a1a;
-    color-scheme: dark;
-  }
-}
 
 *, *::before, *::after { box-sizing: border-box; }
 html { background: var(--bg); color: var(--ink); -webkit-text-size-adjust: 100%; }

@@ -563,10 +563,9 @@
 
   /* ---------------------------------------------------------------- tema */
   const root = document.documentElement;
-  const systemDark = () => window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  // Tema claro por defecto; el oscuro solo si se elige en el menú (se recuerda).
   function currentTheme() {
-    const t = root.getAttribute("data-theme");
-    return t === "dark" || t === "light" ? t : (systemDark() ? "dark" : "light");
+    return root.getAttribute("data-theme") === "dark" ? "dark" : "light";
   }
   function paintThemeLabel() {
     const l = themeBtn.querySelector("[data-theme-label]");

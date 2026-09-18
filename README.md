@@ -7,7 +7,7 @@ Portfolio fotográfico estático (HTML, CSS y JavaScript sin dependencias ni bui
 ## Qué tiene
 
 - Estilo inspirado en la plantilla Gordian de Framer: blanco y negro, títulos en Geist negrita y mayúsculas, todo lo demás en Geist Mono en mayúsculas, tablas de datos etiqueta/valor, secciones numeradas (S01, S02…), fotos a todo el ancho con filetes finos y barra fija inferior con «MENU».
-- Tema claro y oscuro: sigue el ajuste del sistema y se cambia desde el menú («Tema»). Se recuerda la elección.
+- Tema claro por defecto; el oscuro se activa desde el menú («Tema») y se recuerda la elección.
 - Portada: foto a pantalla completa con texto en negrita, fila «Social / Localización» con reloj en directo, Sobre mí (S01), Series (S02), Selección de fotos grandes (S03) y Contacto (S04).
 - Cuatro series: **Paisaje**, **Luna**, **Drone** y **Nocturnas**, con galería filtrable en vista grande (una debajo de otra) o rejilla.
 - Página por fotografía con título grande, ficha etiqueta/valor (serie, lugar, fecha, cámara, objetivo, focal, apertura, velocidad, ISO), enlace «Copia: quiero esta foto» al formulario, imagen a todo el ancho, descripción, mapa y navegación anterior/siguiente.
