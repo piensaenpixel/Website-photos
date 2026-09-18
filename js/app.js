@@ -51,7 +51,7 @@
   function card(p, i) {
     const loc = p.location && p.location.name ? p.location.name : catName(p.category);
     return (
-      '<a class="card reveal" style="--i:' + (i || 0) + '" href="#/foto/' + esc(p.id) + '">' +
+      '<a class="card sr sr-img' + (p.h > p.w ? " card--portrait" : "") + '" style="--i:' + (i || 0) + '" href="#/foto/' + esc(p.id) + '">' +
         '<div class="card__frame">' + imgTag(p, "", 'loading="lazy"') + "</div>" +
         '<div class="card__meta"><span class="card__title">' + esc(p.title) + '</span><span class="card__loc">' + esc(loc) + "</span></div>" +
       "</a>"
@@ -67,7 +67,7 @@
     const series = CATEGORIES.map((c, i) => {
       const n = photosIn(c.id).length;
       return (
-        '<a class="serie reveal" style="--i:' + (i + 1) + '" href="#/galeria/' + c.id + '" data-serie="' + c.id + '">' +
+        '<a class="serie sr" href="#/galeria/' + c.id + '" data-serie="' + c.id + '">' +
           '<span class="serie__num">' + pad(i + 1) + "</span>" +
           '<span class="serie__name">' + esc(c.name) + "</span>" +
           '<span class="serie__count">' + n + (n === 1 ? " foto" : " fotos") + "</span>" +
@@ -82,46 +82,70 @@
       return '<img src="' + esc(p.src) + '" alt="" data-preview="' + c.id + '" class="' + (i === 0 ? "is-active" : "") + '">';
     }).join("");
 
-    const grid = featured.slice(0, 6).map((p, i) => card(p, i)).join("");
+    const feed = featured.slice(0, 8).map((p, i) => feedItem(p, i)).join("");
 
     return (
       '<section class="hero">' +
         '<img class="hero__img" src="' + esc(hero.src) + '" alt="' + esc(hero.alt || hero.title) + '">' +
-        '<p class="eyebrow eyebrow--accent hero__eyebrow reveal">Fotografía · Paisaje · Luna · Drone · Nocturnas</p>' +
+        '<p class="eyebrow eyebrow--accent hero__eyebrow reveal">Paisaje · Luna · Drone · Nocturnas</p>' +
         '<h1 class="hero__title reveal" style="--i:1">Piensa <em>en</em> Pixel</h1>' +
         '<div class="hero__bottom reveal" style="--i:2">' +
           '<p class="hero__tagline">' + esc(SITE.tagline || "") + "</p>" +
-          '<p class="hero__caption">En portada · <a href="#/foto/' + esc(hero.id) + '">' + esc(hero.title) + "</a>" + (hero.location && hero.location.name ? " · " + esc(hero.location.name) : "") + "</p>" +
+          '<p class="hero__caption"><a href="#/foto/' + esc(hero.id) + '">' + esc(hero.title) + "</a>" + (hero.location && hero.location.name ? " · " + esc(hero.location.name) : "") + "</p>" +
         "</div>" +
         '<span class="hero__scroll" aria-hidden="true">Desliza</span>' +
       "</section>" +
 
+      '<section class="feed">' +
+        '<div class="feed__head sr"><h2 class="feed__title">Selección</h2><a class="link-u" href="#/galeria">Toda la galería</a></div>' +
+        feed +
+      "</section>" +
+
       '<section class="series" id="series">' +
-        '<div class="series__head reveal"><span class="eyebrow">Series</span><span class="eyebrow">' + PHOTOS.length + " fotografías</span></div>" +
+        '<div class="series__head sr"><span class="eyebrow">Series</span><span class="eyebrow">' + PHOTOS.length + " fotografías</span></div>" +
         '<div class="series__list">' + series + "</div>" +
-        '<div class="series__preview reveal" style="--i:2" aria-hidden="true">' + previews + '<span class="series__preview-label" id="preview-label">' + esc(CATEGORIES[0] ? CATEGORIES[0].name : "") + "</span></div>" +
+        '<div class="series__preview sr" aria-hidden="true">' + previews + '<span class="series__preview-label" id="preview-label">' + esc(CATEGORIES[0] ? CATEGORIES[0].name : "") + "</span></div>" +
       "</section>" +
 
       '<section class="statement">' +
-        '<span class="eyebrow reveal">Copias</span>' +
-        '<div><p class="reveal" style="--i:1">Cada fotografía de esta web puede colgar de tu pared: copias en <em>edición limitada</em>, impresas sobre papel fine art, numeradas y firmadas.</p>' +
-        '<a class="btn statement__cta reveal" style="--i:2" href="#/contacto">Cómo comprar <span class="btn__arrow">→</span></a></div>' +
-      "</section>" +
-
-      '<section class="featured">' +
-        '<div class="featured__head reveal"><h2 class="featured__title">Selección</h2><a class="link-u" href="#/galeria">Ver toda la galería</a></div>' +
-        '<div class="featured__grid">' + grid + "</div>" +
+        '<span class="eyebrow sr">Copias</span>' +
+        '<div><p class="sr">Copias de <em>edición limitada</em> sobre papel fine art, numeradas y firmadas.</p>' +
+        '<a class="btn statement__cta sr" href="#/contacto">Cómo comprar <span class="btn__arrow">→</span></a></div>' +
       "</section>"
     );
   }
+
+  function feedItem(p, i) {
+    const portrait = p.h > p.w;
+    return (
+      '<a class="feed__item sr sr-img' + (portrait ? " feed__item--portrait" : "") + '" href="#/foto/' + esc(p.id) + '">' +
+        '<div class="feed__media">' + imgTag(p, "", i === 0 ? "" : 'loading="lazy"') + "</div>" +
+        '<div class="feed__caption">' +
+          '<span class="feed__num">' + pad(i + 1) + "</span>" +
+          '<span class="feed__name">' + esc(p.title) + "</span>" +
+          '<span class="feed__meta">' + esc(catName(p.category)) + (p.location && p.location.name ? " · " + esc(p.location.name) : "") + "</span>" +
+        "</div>" +
+      "</a>"
+    );
+  }
+
+  const VIEW_KEY = "gallery-view";
+  function getView() { try { return localStorage.getItem(VIEW_KEY) === "large" ? "large" : "grid"; } catch (e) { return "grid"; } }
+  function setView(v) { try { localStorage.setItem(VIEW_KEY, v); } catch (e) {} }
 
   function renderGallery(cat) {
     const c = cat ? catById(cat) : null;
     if (cat && !c) return renderNotFound();
     const list = photosIn(cat);
+    const view = getView();
     const filters = ['<a href="#/galeria" class="' + (!cat ? "is-active" : "") + '">Todas</a>']
       .concat(CATEGORIES.map((x) => '<a href="#/galeria/' + x.id + '" class="' + (x.id === cat ? "is-active" : "") + '">' + esc(x.name) + "</a>"))
       .join("");
+    const toggle =
+      '<div class="view-toggle" role="group" aria-label="Vista">' +
+        '<button type="button" data-view="grid" class="' + (view === "grid" ? "is-active" : "") + '" aria-label="Vista en rejilla" title="Rejilla"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6"/><rect x="9" y="1" width="6" height="6"/><rect x="1" y="9" width="6" height="6"/><rect x="9" y="9" width="6" height="6"/></svg></button>' +
+        '<button type="button" data-view="large" class="' + (view === "large" ? "is-active" : "") + '" aria-label="Vista grande" title="Grande"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="14" height="6"/><rect x="1" y="9" width="14" height="6"/></svg></button>' +
+      "</div>";
 
     return (
       '<section class="page">' +
@@ -129,13 +153,28 @@
           '<p class="eyebrow reveal">' + (c ? "Serie " + pad(CATEGORIES.indexOf(c) + 1) : "Archivo") + " · " + list.length + (list.length === 1 ? " fotografía" : " fotografías") + "</p>" +
           '<h1 class="page-head__title reveal" style="--i:1">' + esc(c ? c.name : "Galería") + "</h1>" +
           (c ? '<p class="page-head__intro reveal" style="--i:2">' + esc(c.intro) + "</p>" : "") +
-          '<div class="page-head__meta reveal" style="--i:3"><nav class="filters" aria-label="Series">' + filters + "</nav></div>" +
+          '<div class="page-head__meta reveal" style="--i:3"><nav class="filters" aria-label="Series">' + filters + "</nav>" + toggle + "</div>" +
         "</div>" +
         (list.length
-          ? '<div class="masonry">' + list.map((p, i) => card(p, Math.min(i, 8))).join("") + "</div>"
+          ? '<div class="grid' + (view === "large" ? " grid--large" : "") + '" id="gallery-grid">' + list.map((p, i) => card(p, Math.min(i, 8))).join("") + "</div>"
           : '<p class="empty">Aún no hay fotografías en esta serie.</p>') +
       "</section>"
     );
+  }
+
+  function initViewToggle() {
+    const grid = document.getElementById("gallery-grid");
+    app.querySelectorAll("[data-view]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const v = btn.dataset.view;
+        setView(v);
+        app.querySelectorAll("[data-view]").forEach((b) => b.classList.toggle("is-active", b === btn));
+        if (grid) {
+          grid.classList.toggle("grid--large", v === "large");
+          grid.querySelectorAll(".sr").forEach((el) => el.classList.add("is-in"));
+        }
+      });
+    });
   }
 
   function renderPhoto(id) {
@@ -343,9 +382,25 @@
       else { img.addEventListener("load", done, { once: true }); img.addEventListener("error", done, { once: true }); }
     });
 
+    observeReveals();
     if (!seg) initSeriesPreview();
+    if (seg === "galeria") initViewToggle();
     if (seg === "foto") { initMap(); initScrollLinks(); }
     if (seg === "contacto") initForm();
+  }
+
+  /* ------------------------------------------- aparición al hacer scroll */
+  let observer = null;
+  function observeReveals() {
+    if (observer) observer.disconnect();
+    const els = app.querySelectorAll(".sr");
+    if (!("IntersectionObserver" in window)) { els.forEach((el) => el.classList.add("is-in")); return; }
+    observer = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (en.isIntersecting) { en.target.classList.add("is-in"); observer.unobserve(en.target); }
+      });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+    els.forEach((el) => observer.observe(el));
   }
 
   /* -------------------------------------------------- portada: previews */
@@ -468,6 +523,24 @@
       status.textContent = "Se está abriendo tu aplicación de correo. Si no ocurre nada, escríbeme a " + (SITE.email || "mi correo") + ".";
     });
   }
+
+  /* ---------------------------------------------------------------- tema */
+  const themeBtn = document.getElementById("theme-btn");
+  const root = document.documentElement;
+  const systemDark = () => window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  function currentTheme() {
+    const t = root.getAttribute("data-theme");
+    return t === "dark" || t === "light" ? t : (systemDark() ? "dark" : "light");
+  }
+  function applyTheme(t, animate) {
+    if (animate) { root.classList.add("theme-switching"); setTimeout(() => root.classList.remove("theme-switching"), 600); }
+    root.setAttribute("data-theme", t);
+    try { localStorage.setItem("theme", t); } catch (e) {}
+    themeBtn.setAttribute("aria-label", t === "dark" ? "Cambiar a tema claro" : "Cambiar a tema oscuro");
+  }
+  themeBtn.setAttribute("aria-label", currentTheme() === "dark" ? "Cambiar a tema claro" : "Cambiar a tema oscuro");
+  if (!root.getAttribute("data-theme")) root.setAttribute("data-theme", currentTheme());
+  themeBtn.addEventListener("click", () => applyTheme(currentTheme() === "dark" ? "light" : "dark", true));
 
   /* ------------------------------------------------------ menú y cabecera */
   function openMenu() {
