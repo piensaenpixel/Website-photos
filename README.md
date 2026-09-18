@@ -14,7 +14,16 @@ Portfolio fotográfico estático (HTML, CSS y JavaScript sin dependencias ni bui
 - Animaciones: pantalla de carga (una vez por visita), cortina negra entre páginas con el título del destino, títulos que entran palabra a palabra, fotos que se descubren al hacer scroll, parallax en las listas y cursor personalizado con «Ver». Todo se desactiva con «reducir movimiento».
 - Navegación por hash (`#/galeria/luna`, `#/foto/id`...), así que funciona en GitHub Pages sin configuración extra.
 
-## Cómo añadir tus fotos
+## Importar fotos desde Unsplash
+
+El workflow **Importar fotos de Unsplash** (pestaña Actions → Run workflow) descarga con la API las fotos más populares del usuario, sus datos EXIF y su localización, las guarda en `img/fotos/` y las añade a `js/photos.js`. Cómo se comporta:
+
+- Las fotos que ya están en `js/photos.js` (por su `unsplashId`) no se tocan, así que puedes editar títulos, series y descripciones sin miedo a perderlos.
+- Las fotos listadas en `EXCLUDED_UNSPLASH` al final de `js/photos.js` se ignoran. Para descartar una foto, borra su entrada y añade su `unsplashId` a esa lista.
+- Las fotos nuevas llegan con título y descripción automáticos en inglés y serie estimada por palabras clave: revísalas.
+- La clave se pasa como entrada del workflow o, mejor, como secret del repositorio llamado `UNSPLASH_ACCESS_KEY` (Settings → Secrets and variables → Actions). Las apps de Unsplash en modo demo permiten 50 peticiones por hora, unas 45 fotos por ejecución.
+
+## Cómo añadir tus fotos a mano
 
 1. Copia las imágenes a `img/fotos/` (JPG, entre 1600 y 2400 px en el lado largo es un buen equilibrio entre calidad y peso).
 2. Abre `js/photos.js` y añade una entrada al array `PHOTOS` por cada foto. El archivo explica cada campo; lo esencial:

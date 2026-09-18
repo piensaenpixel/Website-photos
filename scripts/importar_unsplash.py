@@ -26,6 +26,23 @@ if not KEY:
 
 remaining = [None]
 
+def read_existing():
+    """Devuelve (entradas actuales, ids de Unsplash excluidos) leyendo js/photos.js con node."""
+    import subprocess
+    code = ("const fs=require('fs');eval(fs.readFileSync(process.argv[1],'utf8').replace(/window\\./g,'globalThis.'));"
+            "console.log(JSON.stringify({photos: globalThis.PHOTOS||[], excluded: globalThis.EXCLUDED_UNSPLASH||[]}))")
+    try:
+        out = subprocess.check_output(["node", "-e", code, PHOTOS_JS], timeout=30).decode("utf-8")
+        d = json.loads(out)
+        return d["photos"], set(d["excluded"])
+    except Exception as e:
+        print("Aviso: no se ha podido leer js/photos.js con node (%s); se parte de cero." % e)
+        return [], set()
+
+existing, excluded = read_existing()
+known = {e.get("unsplashId") for e in existing if e.get("unsplashId")}
+print("Fotos ya en la web: %d · excluidas: %d" % (len(existing), len(excluded)))
+
 def api(path, params=None):
     url = API + path + ("?" + urllib.parse.urlencode(params) if params else "")
     req = urllib.request.Request(url, headers={"Authorization": "Client-ID " + KEY, "Accept-Version": "v1"})
@@ -120,9 +137,12 @@ while len(photos) < MAX:
     if len(batch) < 30:
         break
 photos = photos[:MAX]
-print("Fotos listadas: %d (límite restante de la API: %s)" % (len(photos), remaining[0]))
+total_listed = len(photos)
+photos = [p for p in photos if p["id"] not in excluded and p["id"] not in known]
+print("Fotos listadas: %d · nuevas: %d (límite restante de la API: %s)" % (total_listed, len(photos), remaining[0]))
 if not photos:
-    sys.exit("El usuario no tiene fotos o no se han podido listar.")
+    print("No hay fotos nuevas que importar.")
+    sys.exit(0)
 
 # 2. Detalle de cada foto (EXIF, localización, etiquetas)
 detailed = []
@@ -140,7 +160,7 @@ for i, p in enumerate(photos):
 # 3. Descarga de imágenes
 os.makedirs(IMG_DIR, exist_ok=True)
 entries = []
-used = set()
+used = {e["id"] for e in existing}
 for i, p in enumerate(detailed):
     title = title_for(p)
     slug = slugify(title)
@@ -168,24 +188,28 @@ for i, p in enumerate(detailed):
         "id": slug, "title": title, "category": categorize(p), "src": "img/fotos/" + fname,
         "w": w, "h": h, "description": description_for(p), "date": (p.get("created_at") or "")[:10],
         "location": {"name": loc_name, "lat": lat, "lng": lng},
-        "exif": ex, "featured": i < 8, "forSale": True, "unsplash": p.get("links", {}).get("html", ""),
+        "exif": ex, "featured": False, "forSale": True, "unsplashId": p["id"],
     })
     print("%02d %-10s %s" % (i + 1, entries[-1]["category"], title))
 
 if not entries:
     sys.exit("No se ha descargado ninguna foto.")
 
-# 4. Borrar imágenes que ya no se usan (las de muestra)
-keep = {os.path.basename(e["src"]) for e in entries}
+# 4. Borrar imágenes que no usa ninguna entrada
+all_entries = existing + entries
+keep = {os.path.basename(e["src"]) for e in all_entries}
 for f in os.listdir(IMG_DIR):
     if f.lower().endswith((".jpg", ".jpeg", ".png", ".webp")) and f not in keep:
         os.remove(os.path.join(IMG_DIR, f))
 
 # 5. Regenerar el bloque PHOTOS de js/photos.js
 def entry_js(e):
-    loc = e["location"]
-    lat = "null" if loc["lat"] is None else repr(float(loc["lat"]))
-    lng = "null" if loc["lng"] is None else repr(float(loc["lng"]))
+    loc = e.get("location") or {"name": "", "lat": None, "lng": None}
+    e = dict(e); e["exif"] = e.get("exif") or {}
+    for k in ("camera", "lens", "focal", "aperture", "shutter", "iso"):
+        e["exif"].setdefault(k, "")
+    lat = "null" if loc.get("lat") is None else repr(float(loc["lat"]))
+    lng = "null" if loc.get("lng") is None else repr(float(loc["lng"]))
     ex = e["exif"]
     return (
         "  {\n"
@@ -193,17 +217,18 @@ def entry_js(e):
         "    description: %s,\n    date: %s,\n"
         "    location: { name: %s, lat: %s, lng: %s },\n"
         "    exif: { camera: %s, lens: %s, focal: %s, aperture: %s, shutter: %s, iso: %s },\n"
-        "    featured: %s,\n    forSale: true,\n    unsplash: %s\n  }"
+        "    featured: %s,\n    forSale: %s,\n    unsplashId: %s\n  }"
     ) % (js_str(e["id"]), js_str(e["title"]), js_str(e["category"]), js_str(e["src"]), e["w"], e["h"],
-         js_str(e["description"]), js_str(e["date"]), js_str(loc["name"]), lat, lng,
+         js_str(e.get("description", "")), js_str(e.get("date", "")), js_str(loc.get("name", "")), lat, lng,
          js_str(ex["camera"]), js_str(ex["lens"]), js_str(ex["focal"]), js_str(ex["aperture"]), js_str(ex["shutter"]), js_str(ex["iso"]),
-         "true" if e["featured"] else "false", js_str(e["unsplash"]))
+         "true" if e.get("featured") else "false", "false" if e.get("forSale") is False else "true", js_str(e.get("unsplashId", "")))
 
-block = ("/* PHOTOS:START — el workflow «Importar fotos de Unsplash» reemplaza este bloque */\n"
-         "window.PHOTOS = [\n" + ",\n".join(entry_js(e) for e in entries) + "\n];\n/* PHOTOS:END */\n")
+block = ("/* PHOTOS:START — el workflow «Importar fotos de Unsplash» añade aquí las fotos nuevas y respeta las ya editadas */\n"
+         "window.PHOTOS = [\n" + ",\n".join(entry_js(e) for e in all_entries) + "\n];\n/* PHOTOS:END */\n")
 src = open(PHOTOS_JS, encoding="utf-8").read()
 m = re.search(r"/\* PHOTOS:START.*?/\* PHOTOS:END \*/\n?", src, re.S)
 if not m:
     sys.exit("No se encuentran los marcadores PHOTOS:START / PHOTOS:END en js/photos.js")
 open(PHOTOS_JS, "w", encoding="utf-8").write(src[:m.start()] + block + src[m.end():])
-print("Importadas %d fotos. Series: %s" % (len(entries), {c: sum(1 for e in entries if e["category"] == c) for c in ("paisaje", "luna", "drone", "nocturnas")}))
+print("Añadidas %d fotos nuevas (total %d). Series de las nuevas: %s" % (len(entries), len(all_entries), {c: sum(1 for e in entries if e["category"] == c) for c in ("paisaje", "luna", "drone", "nocturnas")}))
+print("Revisa js/photos.js: las fotos nuevas llegan con título y descripción automáticos en inglés y serie estimada.")
