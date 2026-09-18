@@ -249,6 +249,7 @@ h1, h2, h3, p, dl, dd, dt { margin: 0; }
 /* Formulario */
 .form { display: grid; }
 .form__row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; }
+.form__row[hidden], .field[hidden] { display: none; }
 .field { display: grid; gap: 8px; padding: 18px 0; border-bottom: 1px solid var(--line); }
 .field label { color: var(--muted); }
 .field input, .field textarea, .field select {

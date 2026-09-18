@@ -31,6 +31,10 @@ window.SITE = {
   // Para recibir el formulario sin backend: crea un formulario gratuito en
   // https://formspree.io, copia su ID (algo como "xpzgkbqw") y pégalo aquí.
   formspreeId: "",
+  // Tamaños de copia por defecto (ancho × alto para fotos horizontales; en
+  // las verticales se invierten solos). Cada foto puede tener los suyos con
+  // un campo  sizes: ["30 × 20 cm", ...]  en su entrada.
+  printSizes: ["30 × 20 cm", "45 × 30 cm", "60 × 40 cm", "90 × 60 cm", "120 × 80 cm"],
   instagram: "https://www.instagram.com/piensaenpixel/",
   unsplash: "https://unsplash.com/@piensaenpixel",
   about: [

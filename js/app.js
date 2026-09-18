@@ -253,6 +253,13 @@
   }
 
   /* ------------------------------------------------------------ contacto */
+  function sizesFor(p) {
+    const base = (p && Array.isArray(p.sizes) && p.sizes.length) ? p.sizes : (SITE.printSizes || []);
+    if (!p || p.h <= p.w || (p.sizes && p.sizes.length)) return base;
+    // Foto vertical: invertir ancho × alto de los tamaños por defecto
+    return base.map((sz) => sz.replace(/^(\d+(?:[.,]\d+)?)\s*×\s*(\d+(?:[.,]\d+)?)/, "$2 × $1"));
+  }
+
   function renderContact(params) {
     const p = params.get("photo") ? photoById(params.get("photo")) : null;
     const subject = p ? "I am interested in the photograph “" + p.title + "”" : "";
@@ -260,6 +267,9 @@
       '<option value="Licensing">Licensing</option>',
       '<option value="Commission">Commission or collaboration</option>',
       '<option value="Something else">Something else</option>'].join("");
+    const photoOptions = '<option value="">Choose a photograph</option>' + PHOTOS.filter((x) => x.forSale !== false).map((x) =>
+      '<option value="' + esc(x.title) + '" data-id="' + esc(x.id) + '"' + (p && x.id === p.id ? " selected" : "") + ">" + esc(x.title) + (x.location && x.location.name ? " — " + esc(x.location.name) : "") + "</option>").join("");
+    const sizeOptions = '<option value="">Choose a size</option>' + sizesFor(p).map((sz) => '<option value="' + esc(sz) + '">' + esc(sz) + "</option>").join("");
 
     return (
       '<section class="page">' +
@@ -280,9 +290,10 @@
             '<div class="field"><label for="f-name">Name:</label><input id="f-name" name="name" type="text" placeholder="Your name" required autocomplete="name"></div>' +
             '<div class="field"><label for="f-email">Email:</label><input id="f-email" name="email" type="email" placeholder="you@email.com" required autocomplete="email"></div>' +
           "</div>" +
-          '<div class="form__row">' +
-            '<div class="field"><label for="f-topic">Subject:</label><select id="f-topic" name="subject">' + options + "</select></div>" +
-            '<div class="field"><label for="f-photo">Photograph:</label><input id="f-photo" name="photograph" type="text" placeholder="Photo title" value="' + esc(p ? p.title : "") + '"></div>' +
+          '<div class="field"><label for="f-topic">Subject:</label><select id="f-topic" name="subject">' + options + "</select></div>" +
+          '<div class="form__row" id="f-print" hidden>' +
+            '<div class="field"><label for="f-photo">Photograph:</label><select id="f-photo" name="photograph">' + photoOptions + "</select></div>" +
+            '<div class="field" id="f-size-wrap"><label for="f-size">Size:</label><select id="f-size" name="size">' + sizeOptions + "</select></div>" +
           "</div>" +
           '<div class="field"><label for="f-msg">Message:</label><textarea id="f-msg" name="message" placeholder="Tell me what you have in mind" required>' + esc(subject ? subject + ".\n\n" : "") + "</textarea></div>" +
           '<input type="hidden" name="_subject" value="' + esc(subject || "Message from the website") + '">' +
@@ -524,11 +535,40 @@
     const form = document.getElementById("contact-form");
     const status = document.getElementById("form-status");
     if (!form) return;
+
+    // Desplegables de foto y tamaño, solo para «Buy a print» (foto también para «Licensing»)
+    const topic = document.getElementById("f-topic");
+    const printRow = document.getElementById("f-print");
+    const photoSel = document.getElementById("f-photo");
+    const sizeWrap = document.getElementById("f-size-wrap");
+    const sizeSel = document.getElementById("f-size");
+    const fillSizes = () => {
+      const opt = photoSel.options[photoSel.selectedIndex];
+      const ph = opt && opt.dataset.id ? photoById(opt.dataset.id) : null;
+      sizeSel.innerHTML = '<option value="">Choose a size</option>' + sizesFor(ph).map((sz) => '<option value="' + esc(sz) + '">' + esc(sz) + "</option>").join("");
+    };
+    const syncTopic = () => {
+      const buy = topic.value === "Buy a print";
+      const showPhoto = buy || topic.value === "Licensing";
+      printRow.hidden = !showPhoto;
+      sizeWrap.hidden = !buy;
+      photoSel.disabled = !showPhoto;
+      sizeSel.disabled = !buy;
+    };
+    topic.addEventListener("change", syncTopic);
+    photoSel.addEventListener("change", fillSizes);
+    syncTopic();
+
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       status.classList.remove("is-error");
       if (!form.checkValidity()) {
         status.textContent = "Please check the name, email and message before sending.";
+        status.classList.add("is-error");
+        return;
+      }
+      if (topic.value === "Buy a print" && (!photoSel.value || !sizeSel.value)) {
+        status.textContent = "Please choose the photograph and the size you would like.";
         status.classList.add("is-error");
         return;
       }
@@ -551,7 +591,7 @@
       }
       const subject = data.get("_subject") || "Message from the website";
       const body = ["Name: " + data.get("name"), "Email: " + data.get("email"), "Subject: " + data.get("subject"),
-        data.get("photograph") ? "Photograph: " + data.get("photograph") : "", "", data.get("message")].filter((l) => l !== "").join("\n");
+        data.get("photograph") ? "Photograph: " + data.get("photograph") : "", data.get("size") ? "Size: " + data.get("size") : "", "", data.get("message")].filter((l) => l !== "").join("\n");
       window.location.href = "mailto:" + encodeURIComponent(SITE.email || "") + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
       status.textContent = "Your email app is opening. If nothing happens, write to me at " + (SITE.email || "my email") + ".";
     });
