@@ -1,4 +1,4 @@
-# Piensa en Pixel — web de fotografía
+# piensaenpixel — web de fotografía
 
 Portfolio fotográfico estático (HTML, CSS y JavaScript sin dependencias ni build) pensado para publicarse en GitHub Pages.
 

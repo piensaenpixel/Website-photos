@@ -21,7 +21,7 @@
    ===================================================================== */
 
 window.SITE = {
-  name: "Piensa en Pixel",
+  name: "piensaenpixel",
   tagline: "Landscape, moon, drone and night photography, from Madrid",
   location: "Spain, Madrid",
   author: "Emilio García",
