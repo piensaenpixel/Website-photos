@@ -11,129 +11,130 @@
   const CATEGORIES = window.CATEGORIES || [];
 
   const app = document.getElementById("app");
-  const header = document.getElementById("site-header");
   const menu = document.getElementById("menu");
   const menuBtn = document.getElementById("menu-btn");
+  const loader = document.getElementById("loader");
+  const curtain = document.getElementById("curtain");
+  const curtainLabel = document.getElementById("curtain-label");
+  const cursor = document.getElementById("cursor");
+  const cursorLabel = document.getElementById("cursor-label");
+  const themeBtn = document.getElementById("theme-btn");
   document.getElementById("year").textContent = new Date().getFullYear();
 
   /* ------------------------------------------------------------ helpers */
   const esc = (s) => String(s == null ? "" : s)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-
   const pad = (n) => String(n).padStart(2, "0");
-
   const catById = (id) => CATEGORIES.find((c) => c.id === id);
   const catName = (id) => (catById(id) || {}).name || id;
+  const catIndex = (id) => Math.max(0, CATEGORIES.findIndex((c) => c.id === id));
   const photosIn = (cat) => (cat ? PHOTOS.filter((p) => p.category === cat) : PHOTOS.slice());
   const photoById = (id) => PHOTOS.find((p) => p.id === id);
+  const year = (iso) => (iso || "").slice(0, 4);
+  const locName = (p) => (p.location && p.location.name) || "";
 
   function fmtDate(iso) {
     if (!iso) return "";
     const d = new Date(iso + "T12:00:00");
     if (isNaN(d)) return iso;
-    return d.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
+    return d.toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" });
   }
-
   function fmtCoord(lat, lng) {
     const f = (v, pos, neg) => Math.abs(v).toFixed(4) + "° " + (v >= 0 ? pos : neg);
-    return f(lat, "N", "S") + "  " + f(lng, "E", "O");
+    return f(lat, "N", "S") + " " + f(lng, "E", "O");
   }
-
   function paragraphs(text) {
     return String(text || "").split(/\n\s*\n/).map((p) => "<p>" + esc(p.trim()) + "</p>").join("");
   }
-
-  function imgTag(p, cls, attrs) {
-    return '<img src="' + esc(p.src) + '" alt="' + esc(p.alt || p.title) + '" width="' + (p.w || "") + '" height="' + (p.h || "") + '" data-fade class="' + (cls || "") + '" ' + (attrs || "") + ">";
+  function img(p, attrs) {
+    return '<img src="' + esc(p.src) + '" alt="' + esc(p.alt || p.title) + '" width="' + (p.w || "") + '" height="' + (p.h || "") + '" data-fade ' + (attrs || "") + ">";
+  }
+  function sectionHead(title, num) {
+    return '<div class="section__head sr"><h2 class="t-section">' + esc(title) + '</h2><span class="t-section">S' + pad(num) + "</span></div>";
+  }
+  function metaList(rows, muted) {
+    const r = rows.filter((x) => x[1]);
+    if (!r.length) return "";
+    return '<dl class="meta' + (muted ? " meta--muted" : "") + '">' + r.map((x) => "<dt>" + esc(x[0]) + ":</dt><dd>" + x[1] + "</dd>").join("") + "</dl>";
   }
 
-  function card(p, i) {
-    const loc = p.location && p.location.name ? p.location.name : catName(p.category);
+  /* Un trabajo: fila (serie · año), imagen a todo el ancho, pie (título / lugar) */
+  function work(p, i, lazy) {
+    const portrait = p.h > p.w;
     return (
-      '<a class="card sr sr-img' + (p.h > p.w ? " card--portrait" : "") + '" style="--i:' + (i || 0) + '" href="#/foto/' + esc(p.id) + '" data-cursor="Ver">' +
-        '<div class="card__frame">' + imgTag(p, "", 'loading="lazy"') + "</div>" +
-        '<div class="card__meta"><span class="card__title">' + esc(p.title) + '</span><span class="card__loc">' + esc(loc) + "</span></div>" +
+      '<a class="work sr sr-img' + (portrait ? " work--portrait" : "") + '" style="--i:' + (i || 0) + '" href="#/foto/' + esc(p.id) + '" data-cursor="Ver">' +
+        '<div class="row"><span>' + esc(catName(p.category)) + "</span><span>" + esc(year(p.date)) + "</span></div>" +
+        '<div class="media">' + img(p, lazy ? 'loading="lazy"' : "") + "</div>" +
+        '<div class="work__caption"><strong>' + esc(p.title) + "</strong><span>" + esc(locName(p)) + "</span></div>" +
       "</a>"
     );
   }
 
-  /* ------------------------------------------------------------- páginas */
+  /* ------------------------------------------------------------- portada */
   function renderHome() {
     const featured = PHOTOS.filter((p) => p.featured);
     const hero = featured.find((p) => p.w >= p.h) || PHOTOS[0];
-    if (!hero) return '<section class="page empty">Todavía no hay fotografías. Añádelas en js/photos.js.</section>';
-
-    const series = CATEGORIES.map((c, i) => {
-      const n = photosIn(c.id).length;
-      return (
-        '<a class="serie sr" href="#/galeria/' + c.id + '" data-serie="' + c.id + '">' +
-          '<span class="serie__num">' + pad(i + 1) + "</span>" +
-          '<span class="serie__name">' + esc(c.name) + "</span>" +
-          '<span class="serie__count">' + n + (n === 1 ? " foto" : " fotos") + "</span>" +
-          '<span class="serie__intro">' + esc(c.intro) + "</span>" +
-        "</a>"
-      );
-    }).join("");
-
-    const previews = CATEGORIES.map((c, i) => {
-      const p = photosIn(c.id).find((x) => x.h >= x.w) || photosIn(c.id)[0];
-      if (!p) return "";
-      return '<img src="' + esc(p.src) + '" alt="" data-preview="' + c.id + '" class="' + (i === 0 ? "is-active" : "") + '">';
-    }).join("");
-
-    const feed = featured.slice(0, 8).map((p, i) => feedItem(p, i)).join("");
-    const marquee = CATEGORIES.map((c) => "<span>" + esc(c.name) + "</span>").join("") + "<span>Copias de edición limitada</span><span>Madrid</span>";
+    if (!hero) return '<section class="page"><p class="empty">Todavía no hay fotografías. Añádelas en js/photos.js.</p></section>';
+    const portrait = SITE.portrait ? { src: SITE.portrait, title: SITE.author, w: 1200, h: 1200 } : (PHOTOS.find((p) => p.h > p.w) || hero);
+    const about = (SITE.about || [])[0] || "";
 
     return (
       '<section class="hero">' +
         '<img class="hero__img" src="' + esc(hero.src) + '" alt="' + esc(hero.alt || hero.title) + '">' +
-        '<p class="eyebrow eyebrow--accent hero__eyebrow sr">Paisaje · Luna · Drone · Nocturnas</p>' +
-        '<h1 class="hero__title split" style="--i:1"><span class="w"><span class="w__i" style="--d:0">Piensa</span></span> <span class="w"><span class="w__i" style="--d:90"><em>en</em></span></span> <span class="w"><span class="w__i" style="--d:180">Pixel</span></span></h1>' +
-        '<div class="hero__bottom sr" style="--i:2">' +
-          '<p class="hero__tagline">' + esc(SITE.tagline || "") + "</p>" +
-          '<p class="hero__caption"><a href="#/foto/' + esc(hero.id) + '">' + esc(hero.title) + "</a>" + (hero.location && hero.location.name ? " · " + esc(hero.location.name) : "") + "</p>" +
+        '<p class="t-hero split" data-split>Fotografía de paisaje, luna, dron y nocturna</p>' +
+        '<div class="hero__foot">' +
+          '<p class="t-hero split" data-split>' + esc(SITE.author || SITE.name) + " — Copias de edición limitada</p>" +
+          '<p class="hero__caption sr">' + esc(hero.title) + (locName(hero) ? "<br>" + esc(locName(hero)) : "") + "</p>" +
         "</div>" +
-        '<span class="hero__scroll" aria-hidden="true">Desliza</span>' +
       "</section>" +
 
-      '<section class="feed">' +
-        '<div class="feed__head sr"><h2 class="feed__title split" data-split>Selección</h2><a class="link-u" href="#/galeria">Toda la galería</a></div>' +
-        feed +
+      '<section class="info">' +
+        '<div class="info__block sr"><span>Social:</span><span>' +
+          (SITE.instagram ? '<a href="' + esc(SITE.instagram) + '" target="_blank" rel="noopener">Instagram</a><br>' : "") +
+          (SITE.unsplash ? '<a href="' + esc(SITE.unsplash) + '" target="_blank" rel="noopener">Unsplash</a>' : "") +
+        "</span></div>" +
+        '<div class="info__block info__block--right sr" style="--i:1"><span>Localización:</span><span>' + esc(SITE.location || "España, Madrid") + '<br><span id="clock">' + clockNow() + "</span></span></div>" +
       "</section>" +
 
-      '<div class="marquee" aria-hidden="true"><div class="marquee__track">' + marquee + marquee + "</div></div>" +
-
-      '<section class="series" id="series">' +
-        '<div class="series__head sr"><span class="eyebrow">Series</span><span class="eyebrow">' + PHOTOS.length + " fotografías</span></div>" +
-        '<div class="series__list">' + series + "</div>" +
-        '<div class="series__preview sr" aria-hidden="true">' + previews + '<span class="series__preview-label" id="preview-label">' + esc(CATEGORIES[0] ? CATEGORIES[0].name : "") + "</span></div>" +
+      '<section class="section">' + sectionHead("Sobre mí", 1) +
+        '<div class="section__body">' +
+          '<p class="copy t-muted sr">' + esc(about) + "</p>" +
+          '<div class="sr-img sr" style="margin: 48px 0 24px"><div class="media media--circle">' + img(portrait, 'loading="lazy"') + "</div></div>" +
+          '<div class="row sr"><span>Más:</span><a class="link" href="#/sobre-mi">Ver</a></div>' +
+        "</div>" +
       "</section>" +
 
-      '<section class="statement">' +
-        '<span class="eyebrow sr">Copias</span>' +
-        '<div><p class="sr">Copias de <em>edición limitada</em> sobre papel fine art, numeradas y firmadas.</p>' +
-        '<a class="btn statement__cta sr" href="#/contacto">Cómo comprar <span class="btn__arrow">→</span></a></div>' +
+      '<section class="section">' + sectionHead("Series", 2) +
+        '<div class="section__body"><div class="series">' +
+          CATEGORIES.map((c, i) => {
+            const n = photosIn(c.id).length;
+            return '<a class="sr" style="--i:' + i + '" href="#/galeria/' + c.id + '"><span>' + pad(i + 1) + '</span><span class="t-section">' + esc(c.name) + "</span><span>" + n + (n === 1 ? " foto" : " fotos") + "</span></a>";
+          }).join("") +
+        "</div></div>" +
+      "</section>" +
+
+      '<section class="section">' + sectionHead("Selección", 3) +
+        '<div class="section__body"><div class="works">' + featured.slice(0, 8).map((p, i) => work(p, 0, i > 0)).join("") + "</div>" +
+        '<div class="row sr" style="padding-top: 18px"><span>Archivo:</span><a class="link" href="#/galeria">Ver toda la galería</a></div></div>' +
+      "</section>" +
+
+      '<section class="section" style="padding-bottom: 80px">' + sectionHead("Contacto", 4) +
+        '<div class="section__body sr">' +
+          metaList([
+            ["Email", SITE.email ? '<a href="mailto:' + esc(SITE.email) + '">' + esc(SITE.email) + "</a>" : ""],
+            ["Instagram", SITE.instagram ? '<a href="' + esc(SITE.instagram) + '" target="_blank" rel="noopener">@piensaenpixel</a>' : ""],
+            ["Copias", "Edición limitada, papel fine art"],
+            ["Formulario", '<a href="#/contacto">Ver</a>']
+          ]) +
+        "</div>" +
       "</section>"
     );
   }
 
-  function feedItem(p, i) {
-    const portrait = p.h > p.w;
-    return (
-      '<a class="feed__item sr sr-img' + (portrait ? " feed__item--portrait" : "") + '" href="#/foto/' + esc(p.id) + '" data-cursor="Ver">' +
-        '<div class="feed__media">' + imgTag(p, "", i === 0 ? "" : 'loading="lazy"') + "</div>" +
-        '<div class="feed__caption">' +
-          '<span class="feed__num">' + pad(i + 1) + "</span>" +
-          '<span class="feed__name">' + esc(p.title) + "</span>" +
-          '<span class="feed__meta">' + esc(catName(p.category)) + (p.location && p.location.name ? " · " + esc(p.location.name) : "") + "</span>" +
-        "</div>" +
-      "</a>"
-    );
-  }
-
+  /* ------------------------------------------------------------- galería */
   const VIEW_KEY = "gallery-view";
-  function getView() { try { return localStorage.getItem(VIEW_KEY) === "large" ? "large" : "grid"; } catch (e) { return "grid"; } }
+  function getView() { try { return localStorage.getItem(VIEW_KEY) === "grid" ? "grid" : "large"; } catch (e) { return "large"; } }
   function setView(v) { try { localStorage.setItem(VIEW_KEY, v); } catch (e) {} }
 
   function renderGallery(cat) {
@@ -144,42 +145,46 @@
     const filters = ['<a href="#/galeria" class="' + (!cat ? "is-active" : "") + '">Todas</a>']
       .concat(CATEGORIES.map((x) => '<a href="#/galeria/' + x.id + '" class="' + (x.id === cat ? "is-active" : "") + '">' + esc(x.name) + "</a>"))
       .join("");
-    const toggle =
-      '<div class="view-toggle" role="group" aria-label="Vista">' +
-        '<button type="button" data-view="grid" class="' + (view === "grid" ? "is-active" : "") + '" aria-label="Vista en rejilla" title="Rejilla"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6"/><rect x="9" y="1" width="6" height="6"/><rect x="1" y="9" width="6" height="6"/><rect x="9" y="9" width="6" height="6"/></svg></button>' +
-        '<button type="button" data-view="large" class="' + (view === "large" ? "is-active" : "") + '" aria-label="Vista grande" title="Grande"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="14" height="6"/><rect x="1" y="9" width="14" height="6"/></svg></button>' +
-      "</div>";
 
     return (
       '<section class="page">' +
-        '<div class="page-head">' +
-          '<p class="eyebrow sr">' + (c ? "Serie " + pad(CATEGORIES.indexOf(c) + 1) : "Archivo") + " · " + list.length + (list.length === 1 ? " fotografía" : " fotografías") + "</p>" +
-          '<h1 class="page-head__title split" data-split style="--i:1">' + esc(c ? c.name : "Galería") + "</h1>" +
-          (c ? '<p class="page-head__intro sr" style="--i:2">' + esc(c.intro) + "</p>" : "") +
-          '<div class="page-head__meta sr" style="--i:3"><nav class="filters" aria-label="Series">' + filters + "</nav>" + toggle + "</div>" +
+        '<h1 class="t-display split" data-split>' + esc(c ? c.name : "Galería") + "</h1>" +
+        '<div class="page__meta sr">' +
+          metaList([
+            ["Serie", c ? "S" + pad(catIndex(c.id) + 1) : "Archivo"],
+            ["Fotografías", String(list.length)],
+            ["Copias", "Edición limitada"]
+          ]) +
+        "</div>" +
+        (c ? '<p class="copy t-muted sr" style="margin-bottom: 36px">' + esc(c.intro) + "</p>" : "") +
+        '<div class="row sr" style="margin-bottom: 14px"><nav class="filters" aria-label="Series">' + filters + "</nav>" +
+          '<div class="view" role="group" aria-label="Vista"><button type="button" data-view="large" class="' + (view === "large" ? "is-active" : "") + '">Grande</button><button type="button" data-view="grid" class="' + (view === "grid" ? "is-active" : "") + '">Rejilla</button></div>' +
         "</div>" +
         (list.length
-          ? '<div class="grid' + (view === "large" ? " grid--large" : "") + '" id="gallery-grid">' + list.map((p, i) => card(p, i % 3)).join("") + "</div>"
+          ? '<div class="' + (view === "grid" ? "grid" : "works") + '" id="gallery">' + list.map((p, i) => work(p, i % 3, i > 1)).join("") + "</div>"
           : '<p class="empty">Aún no hay fotografías en esta serie.</p>') +
+        '<div style="height: 80px"></div>' +
       "</section>"
     );
   }
 
   function initViewToggle() {
-    const grid = document.getElementById("gallery-grid");
+    const g = document.getElementById("gallery");
     app.querySelectorAll("[data-view]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const v = btn.dataset.view;
         setView(v);
         app.querySelectorAll("[data-view]").forEach((b) => b.classList.toggle("is-active", b === btn));
-        if (grid) {
-          grid.classList.toggle("grid--large", v === "large");
-          grid.querySelectorAll(".sr").forEach((el) => el.classList.add("is-in"));
+        if (g) {
+          g.className = v === "grid" ? "grid" : "works";
+          g.querySelectorAll(".sr").forEach((el) => el.classList.add("is-in"));
+          updateParallax();
         }
       });
     });
   }
 
+  /* ---------------------------------------------------------------- foto */
   function renderPhoto(id) {
     const p = photoById(id);
     if (!p) return renderNotFound();
@@ -188,149 +193,121 @@
     const prev = siblings[(idx - 1 + siblings.length) % siblings.length];
     const next = siblings[(idx + 1) % siblings.length];
     const ex = p.exif || {};
-    const rows = [
-      ["Cámara", ex.camera], ["Objetivo", ex.lens], ["Focal", ex.focal],
-      ["Apertura", ex.aperture], ["Velocidad", ex.shutter], ["ISO", ex.iso],
-      ["Fecha", fmtDate(p.date)], ["Tamaño", p.w && p.h ? p.w + " × " + p.h + " px" : ""]
-    ].filter((r) => r[1]);
     const hasMap = p.location && typeof p.location.lat === "number" && typeof p.location.lng === "number";
-    const related = siblings.filter((x) => x !== p).slice(0, 4);
-
-    const arrow = (dir) => dir === "prev"
-      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M15 4l-8 8 8 8"/></svg>'
-      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M9 4l8 8-8 8"/></svg>';
 
     return (
-      '<article class="photo">' +
-        '<div class="photo__stage">' +
-          (siblings.length > 1 ? '<a class="photo__nav photo__nav--prev" href="#/foto/' + esc(prev.id) + '" aria-label="Anterior: ' + esc(prev.title) + '">' + arrow("prev") + "</a>" : "") +
-          imgTag(p, "", 'fetchpriority="high"') +
-          (siblings.length > 1 ? '<a class="photo__nav photo__nav--next" href="#/foto/' + esc(next.id) + '" aria-label="Siguiente: ' + esc(next.title) + '">' + arrow("next") + "</a>" : "") +
+      '<section class="page">' +
+        '<h1 class="t-display split" data-split>' + esc(p.title) + "</h1>" +
+        '<div class="page__meta sr">' +
+          metaList([
+            ["Serie", '<a href="#/galeria/' + esc(p.category) + '">' + esc(catName(p.category)) + "</a>"],
+            ["Lugar", esc(locName(p))],
+            ["Fecha", esc(fmtDate(p.date))],
+            ["Cámara", esc(ex.camera)],
+            ["Objetivo", esc(ex.lens)],
+            ["Focal", esc(ex.focal)],
+            ["Apertura", esc(ex.aperture)],
+            ["Velocidad", esc(ex.shutter)],
+            ["ISO", esc(ex.iso)]
+          ]) +
+          (p.forSale !== false ? metaList([["Copia", '<a href="#/contacto?foto=' + encodeURIComponent(p.id) + '">Quiero esta foto</a>']]) : "") +
         "</div>" +
-        '<div class="photo__strip">' +
-          '<a href="#/galeria/' + esc(p.category) + '">← ' + esc(catName(p.category)) + "</a>" +
-          "<span>" + pad(idx + 1) + " / " + pad(siblings.length) + "</span>" +
-          "<span>" + esc(p.location && p.location.name ? p.location.name : "") + "</span>" +
-        "</div>" +
-        '<div class="photo__body">' +
-          "<div>" +
-            '<p class="eyebrow eyebrow--accent sr">' + esc(catName(p.category)) + (p.date ? " · " + esc(fmtDate(p.date)) : "") + "</p>" +
-            '<h1 class="photo__title split" data-split style="--i:1">' + esc(p.title) + "</h1>" +
-            '<div class="photo__desc sr" style="--i:2">' + paragraphs(p.description) + "</div>" +
-            '<div class="photo__actions sr" style="--i:3">' +
-              (p.forSale !== false ? '<a class="btn btn--solid" href="#/contacto?foto=' + encodeURIComponent(p.id) + '">Quiero esta foto <span class="btn__arrow">→</span></a>' : "") +
-              (hasMap ? '<a class="btn" href="#mapa" data-scroll="mapa">Ver en el mapa</a>' : "") +
-              (p.forSale !== false ? '<p class="photo__actions-note">Copias de edición limitada sobre papel fine art. Escríbeme y te cuento tamaños, acabados y precios.</p>' : "") +
-            "</div>" +
-          "</div>" +
-          "<aside>" +
-            '<div class="spec">' +
-              '<div class="spec__head"><h2 class="spec__title">Ficha técnica</h2><span class="eyebrow">EXIF</span></div>' +
-              (rows.length ? "<dl>" + rows.map((r, i) => '<dt class="sr" style="--i:' + (i + 2) + '">' + esc(r[0]) + '</dt><dd class="sr" style="--i:' + (i + 2) + '">' + esc(r[1]) + "</dd>").join("") + "</dl>" : '<p class="eyebrow">Sin datos</p>') +
-            "</div>" +
-            (hasMap
-              ? '<div class="map sr" id="mapa" style="--i:3">' +
-                  '<div class="map__head"><h2 class="map__title">' + esc(p.location.name || "Localización") + '</h2><span class="map__coords">' + fmtCoord(p.location.lat, p.location.lng) + "</span></div>" +
-                  '<div class="map__canvas" id="map-canvas" data-lat="' + p.location.lat + '" data-lng="' + p.location.lng + '" data-name="' + esc(p.location.name || "") + '">' +
-                    '<div class="map__fallback">Cargando mapa…</div>' +
-                  "</div>" +
-                "</div>"
-              : "") +
-          "</aside>" +
-        "</div>" +
-        (related.length
-          ? '<section class="related"><div class="related__head"><h2 class="related__title">Más de ' + esc(catName(p.category)) + '</h2><a class="link-u" href="#/galeria/' + esc(p.category) + '">Ver la serie</a></div>' +
-            '<div class="related__grid">' + related.map((x, i) => card(x, i)).join("") + "</div></section>"
+        '<div class="sr-img sr"><div class="media photo__stage' + (p.h > p.w ? " photo__stage--portrait" : "") + '">' + img(p, 'fetchpriority="high"') + "</div></div>" +
+        '<div class="copy photo__desc sr">' + paragraphs(p.description) + "</div>" +
+        (hasMap
+          ? '<div class="map sr" id="mapa">' +
+              '<div class="row" style="margin-bottom: 14px"><span>Localización: ' + esc(locName(p)) + "</span><span>" + fmtCoord(p.location.lat, p.location.lng) + "</span></div>" +
+              '<div class="map__canvas" id="map-canvas" data-lat="' + p.location.lat + '" data-lng="' + p.location.lng + '" data-name="' + esc(locName(p)) + '"><div class="map__fallback">Cargando mapa…</div></div>' +
+            "</div>"
           : "") +
-      "</article>"
+        (siblings.length > 1
+          ? '<nav class="photo__nav sr"><a class="link" id="nav-prev" href="#/foto/' + esc(prev.id) + '">← ' + esc(prev.title) + '</a><a class="link" id="nav-next" href="#/foto/' + esc(next.id) + '">' + esc(next.title) + " →</a></nav>"
+          : '<div class="photo__nav sr"></div>') +
+        '<div class="row sr" style="padding: 18px 0 80px"><a class="link" href="#/galeria/' + esc(p.category) + '">Volver a ' + esc(catName(p.category)) + "</a><span>" + pad(idx + 1) + " / " + pad(siblings.length) + "</span></div>" +
+      "</section>"
     );
   }
 
+  /* ------------------------------------------------------------ sobre mí */
   function renderAbout() {
-    const portrait = SITE.portrait ? { src: SITE.portrait, title: SITE.author || SITE.name, w: 1200, h: 1500 } : (PHOTOS.find((p) => p.h > p.w) || PHOTOS[0]);
-    const paras = (SITE.about || []).map((t) => "<p>" + esc(t) + "</p>").join("");
+    const portrait = SITE.portrait ? { src: SITE.portrait, title: SITE.author || SITE.name, w: 1200, h: 1200 } : (PHOTOS.find((p) => p.h > p.w) || PHOTOS[0]);
     return (
       '<section class="page">' +
-        '<div class="page-head">' +
-          '<p class="eyebrow sr">Sobre mí</p>' +
-          '<h1 class="page-head__title split" data-split style="--i:1">' + esc(SITE.author || SITE.name) + "</h1>" +
+        '<h1 class="t-display split" data-split>Sobre mí</h1>' +
+        '<div class="page__meta sr">' +
+          metaList([
+            ["Nombre", esc(SITE.author || SITE.name)],
+            ["Base", esc(SITE.location || "España, Madrid")],
+            ["Series", String(CATEGORIES.length)],
+            ["Fotografías", String(PHOTOS.length)],
+            ["Copias", "Edición limitada, numeradas"]
+          ]) +
         "</div>" +
-        '<div class="about">' +
-          '<div class="about__portrait sr" style="--i:1">' + (portrait ? imgTag(portrait, "") : "") + "</div>" +
-          '<div class="about__text sr" style="--i:2">' + paras +
-            '<div class="about__links">' +
-              (SITE.instagram ? '<a class="btn" href="' + esc(SITE.instagram) + '" target="_blank" rel="noopener">Instagram</a>' : "") +
-              (SITE.unsplash ? '<a class="btn" href="' + esc(SITE.unsplash) + '" target="_blank" rel="noopener">Unsplash</a>' : "") +
-              '<a class="btn btn--solid" href="#/contacto">Escríbeme <span class="btn__arrow">→</span></a>' +
-            "</div>" +
-            '<div class="about__facts">' +
-              '<div class="about__fact"><strong>' + PHOTOS.length + "</strong><span>Fotografías</span></div>" +
-              '<div class="about__fact"><strong>' + CATEGORIES.length + "</strong><span>Series</span></div>" +
-              '<div class="about__fact"><strong>Ltd.</strong><span>Copias numeradas</span></div>' +
-            "</div>" +
-          "</div>" +
+        (portrait ? '<div class="sr-img sr" style="margin: 24px 0 48px"><div class="media media--circle">' + img(portrait, "") + "</div></div>" : "") +
+        '<div class="copy sr">' + (SITE.about || []).map((t) => "<p>" + esc(t) + "</p>").join("") + "</div>" +
+        '<div class="sr" style="margin: 48px 0 80px">' +
+          metaList([
+            ["Instagram", SITE.instagram ? '<a href="' + esc(SITE.instagram) + '" target="_blank" rel="noopener">@piensaenpixel</a>' : ""],
+            ["Unsplash", SITE.unsplash ? '<a href="' + esc(SITE.unsplash) + '" target="_blank" rel="noopener">piensaenpixel</a>' : ""],
+            ["Contacto", '<a href="#/contacto">Escríbeme</a>']
+          ]) +
         "</div>" +
       "</section>"
     );
   }
 
+  /* ------------------------------------------------------------ contacto */
   function renderContact(params) {
     const p = params.get("foto") ? photoById(params.get("foto")) : null;
     const subject = p ? "Me interesa la fotografía «" + p.title + "»" : "";
     const options = ['<option value="Compra de una copia"' + (p ? " selected" : "") + ">Compra de una copia</option>",
-      '<option value="Licencia de uso">Licencia de uso / editorial</option>',
+      '<option value="Licencia de uso">Licencia de uso</option>',
       '<option value="Encargo">Encargo o colaboración</option>',
       '<option value="Otra cosa">Otra cosa</option>'].join("");
 
     return (
       '<section class="page">' +
-        '<div class="page-head">' +
-          '<p class="eyebrow sr">Contacto</p>' +
-          '<h1 class="page-head__title split" data-split style="--i:1">Hablemos</h1>' +
-          '<p class="page-head__intro sr" style="--i:2">Si quieres una copia, una licencia o simplemente comentar algo de una foto, este es el sitio. Suelo responder en un par de días.</p>' +
+        '<h1 class="t-display split" data-split>Hablemos</h1>' +
+        '<div class="page__meta sr">' +
+          metaList([
+            ["Email", SITE.email ? '<a href="mailto:' + esc(SITE.email) + '">' + esc(SITE.email) + "</a>" : ""],
+            ["Instagram", SITE.instagram ? '<a href="' + esc(SITE.instagram) + '" target="_blank" rel="noopener">@piensaenpixel</a>' : ""],
+            ["Respuesta", "En un par de días"],
+            ["Copias", "Papel fine art de algodón, edición limitada y numerada"]
+          ]) +
         "</div>" +
-        '<div class="contact">' +
-          '<aside class="contact__aside sr" style="--i:2">' +
-            "<p>Las copias se imprimen bajo pedido en papel fine art de algodón, en ediciones limitadas y numeradas. Dime qué foto te interesa y el tamaño aproximado y te paso opciones y precio.</p>" +
-            (p
-              ? '<a class="contact__photo" href="#/foto/' + esc(p.id) + '">' + '<img src="' + esc(p.src) + '" alt="">' + "<div><strong>" + esc(p.title) + "</strong><span>" + esc(catName(p.category)) + (p.location && p.location.name ? " · " + esc(p.location.name) : "") + "</span></div></a>"
-              : "") +
-            '<div class="contact__list">' +
-              (SITE.email ? '<a href="mailto:' + esc(SITE.email) + '">' + esc(SITE.email) + "<span>Email</span></a>" : "") +
-              (SITE.instagram ? '<a href="' + esc(SITE.instagram) + '" target="_blank" rel="noopener">@piensaenpixel<span>Instagram</span></a>' : "") +
-              (SITE.unsplash ? '<a href="' + esc(SITE.unsplash) + '" target="_blank" rel="noopener">piensaenpixel<span>Unsplash</span></a>' : "") +
-            "</div>" +
-          "</aside>" +
-          '<form class="form sr" id="contact-form" style="--i:3" novalidate>' +
-            '<div class="form__row">' +
-              '<div class="field"><label for="f-name">Nombre</label><input id="f-name" name="name" type="text" placeholder="Tu nombre" required autocomplete="name"></div>' +
-              '<div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" placeholder="tu@correo.com" required autocomplete="email"></div>' +
-            "</div>" +
-            '<div class="form__row">' +
-              '<div class="field"><label for="f-topic">Motivo</label><select id="f-topic" name="motivo">' + options + "</select></div>" +
-              '<div class="field"><label for="f-photo">Fotografía</label><input id="f-photo" name="fotografia" type="text" placeholder="Título de la foto" value="' + esc(p ? p.title : "") + '"></div>' +
-            "</div>" +
-            '<div class="field"><label for="f-msg">Mensaje</label><textarea id="f-msg" name="message" placeholder="Cuéntame qué tienes en mente" required>' + esc(subject ? subject + ".\n\n" : "") + "</textarea></div>" +
-            '<input type="hidden" name="_subject" value="' + esc(subject || "Mensaje desde la web") + '">' +
-            '<label class="hp" aria-hidden="true">No rellenar<input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label>' +
-            '<div class="form__foot">' +
-              '<button class="btn btn--solid" type="submit">Enviar mensaje <span class="btn__arrow">→</span></button>' +
-              '<p class="form__note">' + (SITE.formspreeId ? "El mensaje llega directamente a mi correo." : "Al pulsar se abrirá tu aplicación de correo con el mensaje preparado.") + "</p>" +
-            "</div>" +
-            '<p class="form__status" id="form-status" aria-live="polite"></p>' +
-          "</form>" +
-        "</div>" +
+        (p
+          ? '<div class="row sr" style="margin-bottom: 24px"><span>Fotografía:</span><a class="link" href="#/foto/' + esc(p.id) + '">' + esc(p.title) + (locName(p) ? " — " + esc(locName(p)) : "") + "</a></div>"
+          : "") +
+        '<form class="form sr" id="contact-form" novalidate>' +
+          '<div class="form__row">' +
+            '<div class="field"><label for="f-name">Nombre:</label><input id="f-name" name="name" type="text" placeholder="Tu nombre" required autocomplete="name"></div>' +
+            '<div class="field"><label for="f-email">Email:</label><input id="f-email" name="email" type="email" placeholder="tu@correo.com" required autocomplete="email"></div>' +
+          "</div>" +
+          '<div class="form__row">' +
+            '<div class="field"><label for="f-topic">Motivo:</label><select id="f-topic" name="motivo">' + options + "</select></div>" +
+            '<div class="field"><label for="f-photo">Fotografía:</label><input id="f-photo" name="fotografia" type="text" placeholder="Título de la foto" value="' + esc(p ? p.title : "") + '"></div>' +
+          "</div>" +
+          '<div class="field"><label for="f-msg">Mensaje:</label><textarea id="f-msg" name="message" placeholder="Cuéntame qué tienes en mente" required>' + esc(subject ? subject + ".\n\n" : "") + "</textarea></div>" +
+          '<input type="hidden" name="_subject" value="' + esc(subject || "Mensaje desde la web") + '">' +
+          '<label class="hp" aria-hidden="true">No rellenar<input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label>' +
+          '<div class="form__foot">' +
+            '<button class="btn" type="submit">Enviar mensaje</button>' +
+            '<p class="form__note">' + (SITE.formspreeId ? "El mensaje llega directamente a mi correo." : "Al pulsar se abrirá tu aplicación de correo con el mensaje preparado.") + "</p>" +
+          "</div>" +
+          '<p class="form__status" id="form-status" aria-live="polite"></p>' +
+        "</form>" +
+        '<div style="height: 80px"></div>' +
       "</section>"
     );
   }
 
   function renderNotFound() {
     return (
-      '<section class="page"><div class="page-head">' +
-        '<p class="eyebrow sr">404</p>' +
-        '<h1 class="page-head__title split" data-split style="--i:1">Nada por aquí</h1>' +
-        '<p class="page-head__intro sr" style="--i:2">Esa página no existe. <a class="link-u" href="#/galeria">Vuelve a la galería</a>.</p>' +
-      "</div></section>"
+      '<section class="page">' +
+        '<h1 class="t-display split" data-split>Nada por aquí</h1>' +
+        '<div class="row sr" style="padding-bottom: 80px"><span>Error: 404</span><a class="link" href="#/galeria">Volver a la galería</a></div>' +
+      "</section>"
     );
   }
 
@@ -347,35 +324,33 @@
   function render() {
     const { parts, params } = parseHash();
     const [seg, arg] = parts;
-    let html, title = SITE.name || "", nav = null, key = parts.join("/");
+    let html, title = SITE.name || "", key = parts.join("/");
 
     if (!seg) { html = renderHome(); }
-    else if (seg === "galeria") { html = renderGallery(arg); title = (arg ? catName(arg) : "Galería") + " — " + SITE.name; nav = arg || null; }
-    else if (seg === "foto") { const p = photoById(arg); html = renderPhoto(arg); if (p) { title = p.title + " — " + SITE.name; nav = p.category; } }
-    else if (seg === "sobre-mi") { html = renderAbout(); title = "Sobre mí — " + SITE.name; nav = "sobre-mi"; }
-    else if (seg === "contacto") { html = renderContact(params); title = "Contacto — " + SITE.name; nav = "contacto"; key += "?" + params.toString(); }
+    else if (seg === "galeria") { html = renderGallery(arg); title = (arg ? catName(arg) : "Galería") + " — " + SITE.name; }
+    else if (seg === "foto") { const p = photoById(arg); html = renderPhoto(arg); if (p) title = p.title + " — " + SITE.name; }
+    else if (seg === "sobre-mi") { html = renderAbout(); title = "Sobre mí — " + SITE.name; }
+    else if (seg === "contacto") { html = renderContact(params); title = "Contacto — " + SITE.name; key += "?" + params.toString(); }
     else { html = renderNotFound(); }
 
     if (key === currentKey) return;
     const first = currentKey === null;
     currentKey = key;
-
     document.title = title;
-    document.querySelectorAll(".nav a").forEach((a) => a.classList.toggle("is-active", a.dataset.nav === nav));
     closeMenu();
 
     const swap = () => {
       app.innerHTML = html;
       window.scrollTo({ top: 0, behavior: "instant" });
+      cursor.classList.remove("is-link", "is-view");
       afterRender(seg);
     };
 
     if (first) {
       swap();
-      runLoader(() => startReveals());
+      runLoader(startReveals);
     } else {
-      const label = curtainLabelFor(seg, arg);
-      curtainLabel.textContent = label;
+      curtainLabel.textContent = curtainLabelFor(seg, arg);
       curtain.classList.remove("is-out");
       curtain.classList.add("is-in");
       setTimeout(() => {
@@ -394,14 +369,23 @@
     if (seg === "foto") { const p = photoById(arg); return p ? p.title : ""; }
     if (seg === "sobre-mi") return "Sobre mí";
     if (seg === "contacto") return "Hablemos";
-    return "";
+    return "404";
+  }
+
+  function afterRender(seg) {
+    app.querySelectorAll("img[data-fade]").forEach((el) => {
+      const done = () => el.classList.add("is-loaded");
+      if (el.complete && el.naturalWidth) done();
+      else { el.addEventListener("load", done, { once: true }); el.addEventListener("error", done, { once: true }); }
+    });
+    app.querySelectorAll("[data-split]").forEach(splitWords);
+    initParallax();
+    if (seg === "galeria") initViewToggle();
+    if (seg === "foto") initMap();
+    if (seg === "contacto") initForm();
   }
 
   /* ------------------------------------------------------ pantalla de carga */
-  const loader = document.getElementById("loader");
-  const curtain = document.getElementById("curtain");
-  const curtainLabel = document.getElementById("curtain-label");
-
   function runLoader(done) {
     let seen = false;
     try { seen = sessionStorage.getItem("loaded") === "1"; sessionStorage.setItem("loaded", "1"); } catch (e) {}
@@ -423,22 +407,6 @@
     });
   }
 
-  function afterRender(seg) {
-    // Imágenes: fundido al cargar
-    app.querySelectorAll("img[data-fade]").forEach((img) => {
-      const done = () => img.classList.add("is-loaded");
-      if (img.complete && img.naturalWidth) done();
-      else { img.addEventListener("load", done, { once: true }); img.addEventListener("error", done, { once: true }); }
-    });
-
-    app.querySelectorAll("[data-split]").forEach(splitWords);
-    initParallax();
-    if (!seg) initSeriesPreview();
-    if (seg === "galeria") initViewToggle();
-    if (seg === "foto") { initMap(); initScrollLinks(); }
-    if (seg === "contacto") initForm();
-  }
-
   /* ------------------------------------------- aparición al hacer scroll */
   let observer = null;
   function startReveals() {
@@ -456,7 +424,7 @@
   function splitWords(el) {
     if (el.dataset.splitDone) return;
     const words = el.textContent.trim().split(/\s+/);
-    el.innerHTML = words.map((w, i) => '<span class="w"><span class="w__i" style="--d:' + (i * 70) + '">' + esc(w) + "</span></span>").join(" ");
+    el.innerHTML = words.map((w, i) => '<span class="w"><span class="w__i" style="--d:' + (i * 60) + '">' + esc(w) + "</span></span>").join(" ");
     el.dataset.splitDone = "1";
   }
 
@@ -464,17 +432,16 @@
   let parallaxEls = [];
   let ticking = false;
   function initParallax() {
-    parallaxEls = Array.from(app.querySelectorAll(".feed__media img"));
+    parallaxEls = Array.from(app.querySelectorAll(".works .work .media img"));
     updateParallax();
   }
   function updateParallax() {
-    if (!parallaxEls.length) return;
     const vh = window.innerHeight;
-    parallaxEls.forEach((img) => {
-      const r = img.parentElement.getBoundingClientRect();
+    parallaxEls.forEach((el) => {
+      const r = el.parentElement.getBoundingClientRect();
       if (r.bottom < 0 || r.top > vh) return;
-      const centre = (r.top + r.height / 2 - vh / 2) / vh; // -1 .. 1
-      img.style.setProperty("--py", (centre * -0.06 * r.height).toFixed(1) + "px");
+      const centre = (r.top + r.height / 2 - vh / 2) / vh;
+      el.style.setProperty("--py", (centre * -0.05 * r.height).toFixed(1) + "px");
     });
   }
   window.addEventListener("scroll", () => {
@@ -484,9 +451,11 @@
   }, { passive: true });
   window.addEventListener("resize", updateParallax);
 
+  /* -------------------------------------------------------------- reloj */
+  function clockNow() { return new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" }); }
+  setInterval(() => { const c = document.getElementById("clock"); if (c) c.textContent = clockNow(); }, 1000);
+
   /* ------------------------------------------------------------ cursor */
-  const cursor = document.getElementById("cursor");
-  const cursorLabel = document.getElementById("cursor-label");
   (function initCursor() {
     if (!window.matchMedia || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
     let x = window.innerWidth / 2, y = window.innerHeight / 2, cx = x, cy = y, raf = null;
@@ -499,7 +468,7 @@
       x = e.clientX; y = e.clientY;
       cursor.classList.remove("is-hidden");
       if (!raf) raf = requestAnimationFrame(move);
-      const t = e.target.closest ? e.target.closest("[data-cursor], a, button, .filters a, input, textarea, select") : null;
+      const t = e.target.closest ? e.target.closest("[data-cursor], a, button, input, textarea, select") : null;
       if (t && t.dataset && t.dataset.cursor) {
         cursorLabel.textContent = t.dataset.cursor;
         cursor.classList.add("is-view"); cursor.classList.remove("is-link");
@@ -513,35 +482,10 @@
     document.addEventListener("mouseenter", () => cursor.classList.remove("is-hidden"));
   })();
 
-  /* -------------------------------------------------- portada: previews */
-  function initSeriesPreview() {
-    const imgs = app.querySelectorAll("[data-preview]");
-    const label = document.getElementById("preview-label");
-    app.querySelectorAll("[data-serie]").forEach((a) => {
-      const show = () => {
-        imgs.forEach((i) => i.classList.toggle("is-active", i.dataset.preview === a.dataset.serie));
-        if (label) label.textContent = catName(a.dataset.serie);
-      };
-      a.addEventListener("mouseenter", show);
-      a.addEventListener("focus", show);
-    });
-  }
-
-  function initScrollLinks() {
-    app.querySelectorAll("[data-scroll]").forEach((a) => {
-      a.addEventListener("click", (e) => {
-        e.preventDefault();
-        const el = document.getElementById(a.dataset.scroll);
-        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    });
-  }
-
-  /* ------------------------------------------------------------- mapa */
+  /* -------------------------------------------------------------- mapa */
   const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
   const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
   let leafletPromise = null;
-
   function loadLeaflet() {
     if (window.L) return Promise.resolve(window.L);
     if (leafletPromise) return leafletPromise;
@@ -557,26 +501,23 @@
     });
     return leafletPromise;
   }
-
   function initMap() {
     const el = document.getElementById("map-canvas");
     if (!el) return;
     const lat = parseFloat(el.dataset.lat), lng = parseFloat(el.dataset.lng), name = el.dataset.name;
     const osmLink = "https://www.openstreetmap.org/?mlat=" + lat + "&mlon=" + lng + "#map=11/" + lat + "/" + lng;
-
     const fallback = () => {
-      el.innerHTML = '<div class="map__fallback"><span>' + esc(name) + "<br>" + fmtCoord(lat, lng) + '<br><br><a class="link-u" href="' + osmLink + '" target="_blank" rel="noopener">Abrir en OpenStreetMap</a></span></div>';
+      el.innerHTML = '<div class="map__fallback"><span>' + esc(name) + "<br>" + fmtCoord(lat, lng) + '<br><br><a class="link" href="' + osmLink + '" target="_blank" rel="noopener">Abrir en OpenStreetMap</a></span></div>';
     };
-
     loadLeaflet().then((L) => {
       if (!document.body.contains(el)) return;
       el.innerHTML = "";
-      const map = L.map(el, { scrollWheelZoom: false, zoomControl: true, attributionControl: true }).setView([lat, lng], 9);
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+      const map = L.map(el, { scrollWheelZoom: false }).setView([lat, lng], 9);
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
         maxZoom: 18,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
       }).addTo(map);
-      const icon = L.divIcon({ className: "", html: '<div class="map__pin"></div>', iconSize: [14, 14], iconAnchor: [7, 7] });
+      const icon = L.divIcon({ className: "", html: '<div class="map__pin"></div>', iconSize: [12, 12], iconAnchor: [6, 6] });
       L.marker([lat, lng], { icon, title: name }).addTo(map);
       setTimeout(() => map.invalidateSize(), 300);
     }).catch(fallback);
@@ -587,7 +528,6 @@
     const form = document.getElementById("contact-form");
     const status = document.getElementById("form-status");
     if (!form) return;
-
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       status.classList.remove("is-error");
@@ -598,90 +538,74 @@
       }
       const data = new FormData(form);
       if (data.get("_gotcha")) return;
-
       if (SITE.formspreeId) {
         const btn = form.querySelector("button[type=submit]");
         btn.disabled = true;
         status.textContent = "Enviando…";
         try {
-          const res = await fetch("https://formspree.io/f/" + SITE.formspreeId, {
-            method: "POST", body: data, headers: { Accept: "application/json" }
-          });
+          const res = await fetch("https://formspree.io/f/" + SITE.formspreeId, { method: "POST", body: data, headers: { Accept: "application/json" } });
           if (!res.ok) throw new Error("HTTP " + res.status);
           form.reset();
           status.textContent = "Gracias. Tu mensaje ha llegado, te respondo en cuanto pueda.";
         } catch (err) {
           status.textContent = "No se ha podido enviar. Escríbeme directamente a " + (SITE.email || "mi correo") + ".";
           status.classList.add("is-error");
-        } finally {
-          btn.disabled = false;
-        }
+        } finally { btn.disabled = false; }
         return;
       }
-
-      // Sin Formspree: abrimos el cliente de correo con todo preparado.
       const subject = data.get("_subject") || "Mensaje desde la web";
-      const body = [
-        "Nombre: " + data.get("name"),
-        "Email: " + data.get("email"),
-        "Motivo: " + data.get("motivo"),
-        data.get("fotografia") ? "Fotografía: " + data.get("fotografia") : "",
-        "",
-        data.get("message")
-      ].filter((l) => l !== "").join("\n");
+      const body = ["Nombre: " + data.get("name"), "Email: " + data.get("email"), "Motivo: " + data.get("motivo"),
+        data.get("fotografia") ? "Fotografía: " + data.get("fotografia") : "", "", data.get("message")].filter((l) => l !== "").join("\n");
       window.location.href = "mailto:" + encodeURIComponent(SITE.email || "") + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
       status.textContent = "Se está abriendo tu aplicación de correo. Si no ocurre nada, escríbeme a " + (SITE.email || "mi correo") + ".";
     });
   }
 
   /* ---------------------------------------------------------------- tema */
-  const themeBtn = document.getElementById("theme-btn");
   const root = document.documentElement;
   const systemDark = () => window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
   function currentTheme() {
     const t = root.getAttribute("data-theme");
     return t === "dark" || t === "light" ? t : (systemDark() ? "dark" : "light");
   }
-  function applyTheme(t, animate) {
-    if (animate) { root.classList.add("theme-switching"); setTimeout(() => root.classList.remove("theme-switching"), 600); }
+  function paintThemeLabel() {
+    const l = themeBtn.querySelector("[data-theme-label]");
+    if (l) l.textContent = currentTheme() === "dark" ? "Oscuro" : "Claro";
+    themeBtn.setAttribute("aria-label", currentTheme() === "dark" ? "Cambiar a tema claro" : "Cambiar a tema oscuro");
+  }
+  function applyTheme(t) {
+    root.classList.add("theme-switching"); setTimeout(() => root.classList.remove("theme-switching"), 500);
     root.setAttribute("data-theme", t);
     try { localStorage.setItem("theme", t); } catch (e) {}
-    themeBtn.setAttribute("aria-label", t === "dark" ? "Cambiar a tema claro" : "Cambiar a tema oscuro");
+    paintThemeLabel();
   }
-  themeBtn.setAttribute("aria-label", currentTheme() === "dark" ? "Cambiar a tema claro" : "Cambiar a tema oscuro");
   if (!root.getAttribute("data-theme")) root.setAttribute("data-theme", currentTheme());
-  themeBtn.addEventListener("click", () => applyTheme(currentTheme() === "dark" ? "light" : "dark", true));
+  paintThemeLabel();
+  themeBtn.addEventListener("click", () => applyTheme(currentTheme() === "dark" ? "light" : "dark"));
 
-  /* ------------------------------------------------------ menú y cabecera */
+  /* ---------------------------------------------------------------- menú */
   function openMenu() {
     menu.hidden = false;
     menuBtn.setAttribute("aria-expanded", "true");
-    menuBtn.setAttribute("aria-label", "Cerrar menú");
+    menuBtn.querySelector("[data-open]").hidden = true;
+    menuBtn.querySelector("[data-close]").hidden = false;
     document.body.classList.add("menu-open");
   }
   function closeMenu() {
     if (menu.hidden) return;
     menu.hidden = true;
     menuBtn.setAttribute("aria-expanded", "false");
-    menuBtn.setAttribute("aria-label", "Abrir menú");
+    menuBtn.querySelector("[data-open]").hidden = false;
+    menuBtn.querySelector("[data-close]").hidden = true;
     document.body.classList.remove("menu-open");
   }
   menuBtn.addEventListener("click", () => (menu.hidden ? openMenu() : closeMenu()));
-  menu.addEventListener("click", (e) => { if (e.target.closest("a")) closeMenu(); });
-
-  let lastY = 0;
-  window.addEventListener("scroll", () => {
-    const y = window.scrollY;
-    header.classList.toggle("is-hidden", y > lastY && y > 160 && menu.hidden);
-    lastY = y;
-  }, { passive: true });
+  menu.addEventListener("click", (e) => { const a = e.target.closest("a"); if (a && a.getAttribute("href").startsWith("#/")) { if (a.getAttribute("href").replace(/^#/, "") === location.hash.replace(/^#/, "")) closeMenu(); } });
 
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeMenu();
-    const { parts } = parseHash();
-    if (parts[0] !== "foto") return;
-    if (e.key === "ArrowLeft") { const a = app.querySelector(".photo__nav--prev"); if (a) location.hash = a.getAttribute("href"); }
-    if (e.key === "ArrowRight") { const a = app.querySelector(".photo__nav--next"); if (a) location.hash = a.getAttribute("href"); }
+    if (e.key === "ArrowLeft") { const a = document.getElementById("nav-prev"); if (a) location.hash = a.getAttribute("href"); }
+    if (e.key === "ArrowRight") { const a = document.getElementById("nav-next"); if (a) location.hash = a.getAttribute("href"); }
   });
 
   window.addEventListener("hashchange", render);

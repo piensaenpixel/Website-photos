@@ -6,12 +6,12 @@ Portfolio fotográfico estático (HTML, CSS y JavaScript sin dependencias ni bui
 
 ## Qué tiene
 
-- Tema claro y oscuro: sigue el ajuste del sistema y se puede cambiar con el botón redondo de la cabecera (se recuerda la elección).
-- Portada con foto a pantalla completa, selección de fotos grandes una debajo de otra e índice de series.
-- Cuatro series: **Paisaje**, **Luna**, **Drone** y **Nocturnas**, con galería filtrable en rejilla ordenada o en vista grande (botones a la derecha de los filtros).
-- Animaciones: pantalla de carga con el nombre (una vez por visita), cortina entre páginas con el título del destino, títulos que aparecen palabra a palabra, fotos que se descubren al hacer scroll, parallax en la portada, marquesina y cursor personalizado con «Ver» sobre las fotos. Todo se desactiva si el sistema tiene «reducir movimiento» activado.
-- Página por fotografía con título, descripción, ficha técnica (cámara, objetivo, focal, apertura, velocidad, ISO, fecha), mapa de dónde está hecha y botón «Quiero esta foto» que lleva al formulario de contacto con la foto ya indicada.
-- Página «Sobre mí» y formulario de contacto.
+- Estilo inspirado en la plantilla Gordian de Framer: blanco y negro, títulos en Geist negrita y mayúsculas, todo lo demás en Geist Mono en mayúsculas, tablas de datos etiqueta/valor, secciones numeradas (S01, S02…), fotos a todo el ancho con filetes finos y barra fija inferior con «MENU».
+- Tema claro y oscuro: sigue el ajuste del sistema y se cambia desde el menú («Tema»). Se recuerda la elección.
+- Portada: foto a pantalla completa con texto en negrita, fila «Social / Localización» con reloj en directo, Sobre mí (S01), Series (S02), Selección de fotos grandes (S03) y Contacto (S04).
+- Cuatro series: **Paisaje**, **Luna**, **Drone** y **Nocturnas**, con galería filtrable en vista grande (una debajo de otra) o rejilla.
+- Página por fotografía con título grande, ficha etiqueta/valor (serie, lugar, fecha, cámara, objetivo, focal, apertura, velocidad, ISO), enlace «Copia: quiero esta foto» al formulario, imagen a todo el ancho, descripción, mapa y navegación anterior/siguiente.
+- Animaciones: pantalla de carga (una vez por visita), cortina negra entre páginas con el título del destino, títulos que entran palabra a palabra, fotos que se descubren al hacer scroll, parallax en las listas y cursor personalizado con «Ver». Todo se desactiva con «reducir movimiento».
 - Navegación por hash (`#/galeria/luna`, `#/foto/id`...), así que funciona en GitHub Pages sin configuración extra.
 
 ## Cómo añadir tus fotos

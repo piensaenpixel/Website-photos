@@ -23,6 +23,7 @@
 window.SITE = {
   name: "Piensa en Pixel",
   tagline: "Fotografía de paisaje, luna, dron y noche, desde Madrid",
+  location: "España, Madrid",
   author: "Emilio García",
   // Correo al que llegan los mensajes de contacto (se usa como
   // alternativa si no configuras Formspree).
