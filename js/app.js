@@ -81,7 +81,6 @@
     return (
       '<section class="hero">' +
         '<img class="hero__img" src="' + esc(hero.src) + '" alt="' + esc(hero.alt || hero.title) + '">' +
-        '<p class="t-hero split" data-split>Fotografía de paisaje, luna, dron y nocturna</p>' +
         '<div class="hero__foot">' +
           '<p class="t-hero split" data-split>' + esc(SITE.author || SITE.name) + " — Copias de edición limitada</p>" +
           '<p class="hero__caption sr">' + esc(hero.title) + (locName(hero) ? "<br>" + esc(locName(hero)) : "") + "</p>" +

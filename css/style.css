@@ -140,7 +140,7 @@ h1, h2, h3, p, dl, dd, dt { margin: 0; }
   height: 100svh;
   min-height: 520px;
   overflow: hidden;
-  display: flex; flex-direction: column; justify-content: space-between;
+  display: flex; flex-direction: column; justify-content: flex-end;
   padding: calc(var(--gutter) * 0.9) var(--gutter) calc(var(--bar-h) + 24px);
   color: #fff;
   isolation: isolate;
