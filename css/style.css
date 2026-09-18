@@ -108,6 +108,8 @@ h1, h2, h3, p, dl, dd, dt { margin: 0; }
   border-bottom: 1px solid var(--line);
 }
 .section__body { padding-top: 24px; }
+.section__body:has(> .series), .section__body:has(> .works) { padding-top: 0; }
+.section__body > .series, .section__body > .works { border-top: 0; }
 
 /* Tabla de datos etiqueta / valor */
 .meta { display: grid; grid-template-columns: max-content 1fr; column-gap: 24px; row-gap: 2px; }
