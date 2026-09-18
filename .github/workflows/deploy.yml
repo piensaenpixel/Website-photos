@@ -25,7 +25,7 @@ jobs:
       - name: Preparar la carpeta a publicar
         run: |
           mkdir -p _site
-          rsync -a --exclude '.git' --exclude '.github' --exclude '_site' --exclude 'README.md' ./ _site/
+          rsync -a --exclude '.git' --exclude '.github' --exclude '_site' --exclude 'README.md' --exclude 'scripts' ./ _site/
 
       - name: Publicar en la rama gh-pages
         uses: peaceiris/actions-gh-pages@v4

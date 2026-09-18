@@ -63,6 +63,7 @@ window.CATEGORIES = [
   }
 ];
 
+/* PHOTOS:START — el workflow «Importar fotos de Unsplash» reemplaza este bloque */
 window.PHOTOS = [
   /* ---------------------------------------------------------------- PAISAJE */
   {
@@ -241,3 +242,4 @@ window.PHOTOS = [
     forSale: true
   }
 ];
+/* PHOTOS:END */

@@ -1,0 +1,54 @@
+# Descarga las fotos del usuario de Unsplash con su API y las añade al sitio.
+# Se lanza a mano desde la pestaña Actions (o por API). La clave puede pasarse
+# como entrada o guardarse como secret UNSPLASH_ACCESS_KEY en el repositorio.
+name: Importar fotos de Unsplash
+
+on:
+  workflow_dispatch:
+    inputs:
+      access_key:
+        description: "Access Key de Unsplash (si se deja vacío se usa el secret UNSPLASH_ACCESS_KEY)"
+        required: false
+        type: string
+      max_photos:
+        description: "Número máximo de fotos a importar"
+        required: false
+        default: "40"
+        type: string
+      username:
+        description: "Usuario de Unsplash"
+        required: false
+        default: "piensaenpixel"
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: importar-unsplash
+  cancel-in-progress: false
+
+jobs:
+  importar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Importar fotos y datos
+        env:
+          UNSPLASH_ACCESS_KEY: ${{ inputs.access_key != '' && inputs.access_key || secrets.UNSPLASH_ACCESS_KEY }}
+          MAX_PHOTOS: ${{ inputs.max_photos }}
+          UNSPLASH_USER: ${{ inputs.username }}
+        run: |
+          echo "::add-mask::$UNSPLASH_ACCESS_KEY"
+          python3 scripts/importar_unsplash.py
+
+      - name: Guardar en la rama
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A img/fotos js/photos.js
+          if git diff --cached --quiet; then echo "Sin cambios"; exit 0; fi
+          git commit -m "Importar fotos desde Unsplash"
+          git push
