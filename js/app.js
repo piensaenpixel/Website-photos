@@ -1,6 +1,6 @@
 /* =====================================================================
-   PIENSA EN PIXEL — aplicación
-   Router por hash (#/galeria/luna, #/foto/id, ...) sin dependencias.
+   PIENSA EN PIXEL — application
+   Router por hash (#/gallery/luna, #/photo/id, ...) sin dependencias.
    Los datos viven en js/photos.js.
    ===================================================================== */
 (function () {
@@ -38,11 +38,11 @@
     if (!iso) return "";
     const d = new Date(iso + "T12:00:00");
     if (isNaN(d)) return iso;
-    return d.toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" });
+    return d.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" });
   }
   function fmtCoord(lat, lng) {
     const f = (v, pos, neg) => Math.abs(v).toFixed(4) + "° " + (v >= 0 ? pos : neg);
-    return f(lat, "N", "S") + " " + f(lng, "E", "O");
+    return f(lat, "N", "S") + " " + f(lng, "E", "W");
   }
   function paragraphs(text) {
     return String(text || "").split(/\n\s*\n/).map((p) => "<p>" + esc(p.trim()) + "</p>").join("");
@@ -63,7 +63,7 @@
   function work(p, i, lazy) {
     const portrait = p.h > p.w;
     return (
-      '<a class="work sr sr-img' + (portrait ? " work--portrait" : "") + '" style="--i:' + (i || 0) + '" href="#/foto/' + esc(p.id) + '" data-cursor="Ver">' +
+      '<a class="work sr sr-img' + (portrait ? " work--portrait" : "") + '" style="--i:' + (i || 0) + '" href="#/photo/' + esc(p.id) + '" data-cursor="View">' +
         '<div class="row"><span>' + esc(catName(p.category)) + "</span><span>" + esc(year(p.date)) + "</span></div>" +
         '<div class="media">' + img(p, lazy ? 'loading="lazy"' : "") + "</div>" +
         '<div class="work__caption"><strong>' + esc(p.title) + "</strong><span>" + esc(locName(p)) + "</span></div>" +
@@ -75,14 +75,14 @@
   function renderHome() {
     const featured = PHOTOS.filter((p) => p.featured);
     const hero = featured.find((p) => p.w >= p.h) || PHOTOS[0];
-    if (!hero) return '<section class="page"><p class="empty">Todavía no hay fotografías. Añádelas en js/photos.js.</p></section>';
+    if (!hero) return '<section class="page"><p class="empty">No photographs yet. Add them in js/photos.js.</p></section>';
     const about = (SITE.about || [])[0] || "";
 
     return (
       '<section class="hero">' +
         '<img class="hero__img" src="' + esc(hero.src) + '" alt="' + esc(hero.alt || hero.title) + '">' +
         '<div class="hero__foot">' +
-          '<p class="t-hero split" data-split>' + esc(SITE.author || SITE.name) + " — Copias de edición limitada</p>" +
+          '<p class="t-hero split" data-split>' + esc(SITE.author || SITE.name) + " — Limited-edition prints</p>" +
           '<p class="hero__caption sr">' + esc(hero.title) + (locName(hero) ? "<br>" + esc(locName(hero)) : "") + "</p>" +
         "</div>" +
       "</section>" +
@@ -92,10 +92,10 @@
           (SITE.instagram ? '<a href="' + esc(SITE.instagram) + '" target="_blank" rel="noopener">Instagram</a><br>' : "") +
           (SITE.unsplash ? '<a href="' + esc(SITE.unsplash) + '" target="_blank" rel="noopener">Unsplash</a>' : "") +
         "</span></div>" +
-        '<div class="info__block info__block--right sr" style="--i:1"><span>Localización:</span><span>' + esc(SITE.location || "España, Madrid") + '<br><span id="clock">' + clockNow() + "</span></span></div>" +
+        '<div class="info__block info__block--right sr" style="--i:1"><span>Location:</span><span>' + esc(SITE.location || "Spain, Madrid") + '<br><span id="clock">' + clockNow() + "</span></span></div>" +
       "</section>" +
 
-      '<section class="section">' + sectionHead("Sobre mí", 1) +
+      '<section class="section">' + sectionHead("About", 1) +
         '<div class="section__body">' +
           '<p class="copy t-muted sr">' + esc(about) + "</p>" +
         "</div>" +
@@ -105,23 +105,23 @@
         '<div class="section__body"><div class="series">' +
           CATEGORIES.map((c, i) => {
             const n = photosIn(c.id).length;
-            return '<a class="sr" style="--i:' + i + '" href="#/galeria/' + c.id + '"><span>' + pad(i + 1) + '</span><span class="t-section">' + esc(c.name) + "</span><span>" + n + (n === 1 ? " foto" : " fotos") + "</span></a>";
+            return '<a class="sr" style="--i:' + i + '" href="#/gallery/' + c.id + '"><span>' + pad(i + 1) + '</span><span class="t-section">' + esc(c.name) + "</span><span>" + n + (n === 1 ? " photo" : " photos") + "</span></a>";
           }).join("") +
         "</div></div>" +
       "</section>" +
 
-      '<section class="section">' + sectionHead("Selección", 3) +
+      '<section class="section">' + sectionHead("Selected", 3) +
         '<div class="section__body"><div class="works">' + featured.slice(0, 8).map((p, i) => work(p, 0, i > 0)).join("") + "</div>" +
-        '<div class="row sr" style="padding-top: 18px"><span>Archivo:</span><a class="link" href="#/galeria">Ver toda la galería</a></div></div>' +
+        '<div class="row sr" style="padding-top: 18px"><span>Archive:</span><a class="link" href="#/gallery">See the full gallery</a></div></div>' +
       "</section>" +
 
-      '<section class="section" style="padding-bottom: 80px">' + sectionHead("Contacto", 4) +
+      '<section class="section" style="padding-bottom: 80px">' + sectionHead("Contact", 4) +
         '<div class="section__body sr">' +
           metaList([
             ["Email", SITE.email ? '<a href="mailto:' + esc(SITE.email) + '">' + esc(SITE.email) + "</a>" : ""],
             ["Instagram", SITE.instagram ? '<a href="' + esc(SITE.instagram) + '" target="_blank" rel="noopener">@piensaenpixel</a>' : ""],
-            ["Copias", "Edición limitada, papel fine art"],
-            ["Formulario", '<a href="#/contacto">Ver</a>']
+            ["Prints", "Limited edition, fine art paper"],
+            ["Form", '<a href="#/contact">View</a>']
           ]) +
         "</div>" +
       "</section>"
@@ -138,27 +138,27 @@
     if (cat && !c) return renderNotFound();
     const list = photosIn(cat);
     const view = getView();
-    const filters = ['<a href="#/galeria" class="' + (!cat ? "is-active" : "") + '">Todas</a>']
-      .concat(CATEGORIES.map((x) => '<a href="#/galeria/' + x.id + '" class="' + (x.id === cat ? "is-active" : "") + '">' + esc(x.name) + "</a>"))
+    const filters = ['<a href="#/gallery" class="' + (!cat ? "is-active" : "") + '">All</a>']
+      .concat(CATEGORIES.map((x) => '<a href="#/gallery/' + x.id + '" class="' + (x.id === cat ? "is-active" : "") + '">' + esc(x.name) + "</a>"))
       .join("");
 
     return (
       '<section class="page">' +
-        '<h1 class="t-display split" data-split>' + esc(c ? c.name : "Galería") + "</h1>" +
+        '<h1 class="t-display split" data-split>' + esc(c ? c.name : "Gallery") + "</h1>" +
         '<div class="page__meta sr">' +
           metaList([
-            ["Serie", c ? "S" + pad(catIndex(c.id) + 1) : "Archivo"],
-            ["Fotografías", String(list.length)],
-            ["Copias", "Edición limitada"]
+            ["Series", c ? "S" + pad(catIndex(c.id) + 1) : "Archive"],
+            ["Photographs", String(list.length)],
+            ["Prints", "Limited edition"]
           ]) +
         "</div>" +
         (c ? '<p class="copy t-muted sr" style="margin-bottom: 36px">' + esc(c.intro) + "</p>" : "") +
         '<div class="row sr" style="margin-bottom: 14px"><nav class="filters" aria-label="Series">' + filters + "</nav>" +
-          '<div class="view" role="group" aria-label="Vista"><button type="button" data-view="large" class="' + (view === "large" ? "is-active" : "") + '">Grande</button><button type="button" data-view="grid" class="' + (view === "grid" ? "is-active" : "") + '">Rejilla</button></div>' +
+          '<div class="view" role="group" aria-label="View"><button type="button" data-view="large" class="' + (view === "large" ? "is-active" : "") + '">Large</button><button type="button" data-view="grid" class="' + (view === "grid" ? "is-active" : "") + '">Grid</button></div>' +
         "</div>" +
         (list.length
           ? '<div class="' + (view === "grid" ? "grid" : "works") + '" id="gallery">' + list.map((p, i) => work(p, i % 3, i > 1)).join("") + "</div>"
-          : '<p class="empty">Aún no hay fotografías en esta serie.</p>') +
+          : '<p class="empty">No photographs in this series yet.</p>') +
         '<div style="height: 80px"></div>' +
       "</section>"
     );
@@ -196,30 +196,30 @@
         '<h1 class="t-display split" data-split>' + esc(p.title) + "</h1>" +
         '<div class="page__meta sr">' +
           metaList([
-            ["Serie", '<a href="#/galeria/' + esc(p.category) + '">' + esc(catName(p.category)) + "</a>"],
-            ["Lugar", esc(locName(p))],
-            ["Fecha", esc(fmtDate(p.date))],
-            ["Cámara", esc(ex.camera)],
-            ["Objetivo", esc(ex.lens)],
-            ["Focal", esc(ex.focal)],
-            ["Apertura", esc(ex.aperture)],
-            ["Velocidad", esc(ex.shutter)],
+            ["Series", '<a href="#/gallery/' + esc(p.category) + '">' + esc(catName(p.category)) + "</a>"],
+            ["Place", esc(locName(p))],
+            ["Date", esc(fmtDate(p.date))],
+            ["Camera", esc(ex.camera)],
+            ["Lens", esc(ex.lens)],
+            ["Focal length", esc(ex.focal)],
+            ["Aperture", esc(ex.aperture)],
+            ["Shutter", esc(ex.shutter)],
             ["ISO", esc(ex.iso)]
           ]) +
-          (p.forSale !== false ? metaList([["Copia", '<a href="#/contacto?foto=' + encodeURIComponent(p.id) + '">Quiero esta foto</a>']]) : "") +
+          (p.forSale !== false ? metaList([["Print", '<a href="#/contact?photo=' + encodeURIComponent(p.id) + '">I want this photo</a>']]) : "") +
         "</div>" +
         '<div class="sr-img sr"><div class="media photo__stage' + (p.h > p.w ? " photo__stage--portrait" : "") + '">' + img(p, 'fetchpriority="high"') + "</div></div>" +
         '<div class="copy photo__desc sr">' + paragraphs(p.description) + "</div>" +
         (hasMap
           ? '<div class="map sr" id="mapa">' +
-              '<div class="row" style="margin-bottom: 14px"><span>Localización: ' + esc(locName(p)) + "</span><span>" + fmtCoord(p.location.lat, p.location.lng) + "</span></div>" +
-              '<div class="map__canvas" id="map-canvas" data-lat="' + p.location.lat + '" data-lng="' + p.location.lng + '" data-name="' + esc(locName(p)) + '"><div class="map__fallback">Cargando mapa…</div></div>' +
+              '<div class="row" style="margin-bottom: 14px"><span>Location: ' + esc(locName(p)) + "</span><span>" + fmtCoord(p.location.lat, p.location.lng) + "</span></div>" +
+              '<div class="map__canvas" id="map-canvas" data-lat="' + p.location.lat + '" data-lng="' + p.location.lng + '" data-name="' + esc(locName(p)) + '"><div class="map__fallback">Loading map…</div></div>' +
             "</div>"
           : "") +
         (siblings.length > 1
-          ? '<nav class="photo__nav sr"><a class="link" id="nav-prev" href="#/foto/' + esc(prev.id) + '">← ' + esc(prev.title) + '</a><a class="link" id="nav-next" href="#/foto/' + esc(next.id) + '">' + esc(next.title) + " →</a></nav>"
+          ? '<nav class="photo__nav sr"><a class="link" id="nav-prev" href="#/photo/' + esc(prev.id) + '">← ' + esc(prev.title) + '</a><a class="link" id="nav-next" href="#/photo/' + esc(next.id) + '">' + esc(next.title) + " →</a></nav>"
           : '<div class="photo__nav sr"></div>') +
-        '<div class="row sr" style="padding: 18px 0 80px"><a class="link" href="#/galeria/' + esc(p.category) + '">Volver a ' + esc(catName(p.category)) + "</a><span>" + pad(idx + 1) + " / " + pad(siblings.length) + "</span></div>" +
+        '<div class="row sr" style="padding: 18px 0 80px"><a class="link" href="#/gallery/' + esc(p.category) + '">Back to ' + esc(catName(p.category)) + "</a><span>" + pad(idx + 1) + " / " + pad(siblings.length) + "</span></div>" +
       "</section>"
     );
   }
@@ -229,14 +229,14 @@
     const portrait = SITE.portrait ? { src: SITE.portrait, title: SITE.author || SITE.name, w: 1200, h: 1200 } : (PHOTOS.find((p) => p.h > p.w) || PHOTOS[0]);
     return (
       '<section class="page">' +
-        '<h1 class="t-display split" data-split>Sobre mí</h1>' +
+        '<h1 class="t-display split" data-split>About</h1>' +
         '<div class="page__meta sr">' +
           metaList([
-            ["Nombre", esc(SITE.author || SITE.name)],
-            ["Base", esc(SITE.location || "España, Madrid")],
+            ["Name", esc(SITE.author || SITE.name)],
+            ["Based in", esc(SITE.location || "Spain, Madrid")],
             ["Series", String(CATEGORIES.length)],
-            ["Fotografías", String(PHOTOS.length)],
-            ["Copias", "Edición limitada, numeradas"]
+            ["Photographs", String(PHOTOS.length)],
+            ["Prints", "Limited edition, numbered"]
           ]) +
         "</div>" +
         (portrait ? '<div class="sr-img sr" style="margin: 24px 0 48px"><div class="media media--circle">' + img(portrait, "") + "</div></div>" : "") +
@@ -245,7 +245,7 @@
           metaList([
             ["Instagram", SITE.instagram ? '<a href="' + esc(SITE.instagram) + '" target="_blank" rel="noopener">@piensaenpixel</a>' : ""],
             ["Unsplash", SITE.unsplash ? '<a href="' + esc(SITE.unsplash) + '" target="_blank" rel="noopener">piensaenpixel</a>' : ""],
-            ["Contacto", '<a href="#/contacto">Escríbeme</a>']
+            ["Contact", '<a href="#/contact">Write to me</a>']
           ]) +
         "</div>" +
       "</section>"
@@ -254,42 +254,42 @@
 
   /* ------------------------------------------------------------ contacto */
   function renderContact(params) {
-    const p = params.get("foto") ? photoById(params.get("foto")) : null;
-    const subject = p ? "Me interesa la fotografía «" + p.title + "»" : "";
-    const options = ['<option value="Compra de una copia"' + (p ? " selected" : "") + ">Compra de una copia</option>",
-      '<option value="Licencia de uso">Licencia de uso</option>',
-      '<option value="Encargo">Encargo o colaboración</option>',
-      '<option value="Otra cosa">Otra cosa</option>'].join("");
+    const p = params.get("photo") ? photoById(params.get("photo")) : null;
+    const subject = p ? "I am interested in the photograph “" + p.title + "”" : "";
+    const options = ['<option value="Buy a print"' + (p ? " selected" : "") + ">Buy a print</option>",
+      '<option value="Licensing">Licensing</option>',
+      '<option value="Commission">Commission or collaboration</option>',
+      '<option value="Something else">Something else</option>'].join("");
 
     return (
       '<section class="page">' +
-        '<h1 class="t-display split" data-split>Hablemos</h1>' +
+        '<h1 class="t-display split" data-split>Let\'s talk</h1>' +
         '<div class="page__meta sr">' +
           metaList([
             ["Email", SITE.email ? '<a href="mailto:' + esc(SITE.email) + '">' + esc(SITE.email) + "</a>" : ""],
             ["Instagram", SITE.instagram ? '<a href="' + esc(SITE.instagram) + '" target="_blank" rel="noopener">@piensaenpixel</a>' : ""],
-            ["Respuesta", "En un par de días"],
-            ["Copias", "Papel fine art de algodón, edición limitada y numerada"]
+            ["Reply", "Within a couple of days"],
+            ["Prints", "Cotton fine art paper, limited and numbered edition"]
           ]) +
         "</div>" +
         (p
-          ? '<div class="row sr" style="margin-bottom: 24px"><span>Fotografía:</span><a class="link" href="#/foto/' + esc(p.id) + '">' + esc(p.title) + (locName(p) ? " — " + esc(locName(p)) : "") + "</a></div>"
+          ? '<div class="row sr" style="margin-bottom: 24px"><span>Photograph:</span><a class="link" href="#/photo/' + esc(p.id) + '">' + esc(p.title) + (locName(p) ? " — " + esc(locName(p)) : "") + "</a></div>"
           : "") +
         '<form class="form sr" id="contact-form" novalidate>' +
           '<div class="form__row">' +
-            '<div class="field"><label for="f-name">Nombre:</label><input id="f-name" name="name" type="text" placeholder="Tu nombre" required autocomplete="name"></div>' +
-            '<div class="field"><label for="f-email">Email:</label><input id="f-email" name="email" type="email" placeholder="tu@correo.com" required autocomplete="email"></div>' +
+            '<div class="field"><label for="f-name">Name:</label><input id="f-name" name="name" type="text" placeholder="Your name" required autocomplete="name"></div>' +
+            '<div class="field"><label for="f-email">Email:</label><input id="f-email" name="email" type="email" placeholder="you@email.com" required autocomplete="email"></div>' +
           "</div>" +
           '<div class="form__row">' +
-            '<div class="field"><label for="f-topic">Motivo:</label><select id="f-topic" name="motivo">' + options + "</select></div>" +
-            '<div class="field"><label for="f-photo">Fotografía:</label><input id="f-photo" name="fotografia" type="text" placeholder="Título de la foto" value="' + esc(p ? p.title : "") + '"></div>' +
+            '<div class="field"><label for="f-topic">Subject:</label><select id="f-topic" name="subject">' + options + "</select></div>" +
+            '<div class="field"><label for="f-photo">Photograph:</label><input id="f-photo" name="photograph" type="text" placeholder="Photo title" value="' + esc(p ? p.title : "") + '"></div>' +
           "</div>" +
-          '<div class="field"><label for="f-msg">Mensaje:</label><textarea id="f-msg" name="message" placeholder="Cuéntame qué tienes en mente" required>' + esc(subject ? subject + ".\n\n" : "") + "</textarea></div>" +
-          '<input type="hidden" name="_subject" value="' + esc(subject || "Mensaje desde la web") + '">' +
-          '<label class="hp" aria-hidden="true">No rellenar<input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label>' +
+          '<div class="field"><label for="f-msg">Message:</label><textarea id="f-msg" name="message" placeholder="Tell me what you have in mind" required>' + esc(subject ? subject + ".\n\n" : "") + "</textarea></div>" +
+          '<input type="hidden" name="_subject" value="' + esc(subject || "Message from the website") + '">' +
+          '<label class="hp" aria-hidden="true">Leave empty<input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label>' +
           '<div class="form__foot">' +
-            '<button class="btn" type="submit">Enviar mensaje</button>' +
-            '<p class="form__note">' + (SITE.formspreeId ? "El mensaje llega directamente a mi correo." : "Al pulsar se abrirá tu aplicación de correo con el mensaje preparado.") + "</p>" +
+            '<button class="btn" type="submit">Send message</button>' +
+            '<p class="form__note">' + (SITE.formspreeId ? "The message goes straight to my inbox." : "Your email app will open with the message ready to send.") + "</p>" +
           "</div>" +
           '<p class="form__status" id="form-status" aria-live="polite"></p>' +
         "</form>" +
@@ -301,8 +301,8 @@
   function renderNotFound() {
     return (
       '<section class="page">' +
-        '<h1 class="t-display split" data-split>Nada por aquí</h1>' +
-        '<div class="row sr" style="padding-bottom: 80px"><span>Error: 404</span><a class="link" href="#/galeria">Volver a la galería</a></div>' +
+        '<h1 class="t-display split" data-split>Nothing here</h1>' +
+        '<div class="row sr" style="padding-bottom: 80px"><span>Error: 404</span><a class="link" href="#/gallery">Back to the gallery</a></div>' +
       "</section>"
     );
   }
@@ -323,10 +323,10 @@
     let html, title = SITE.name || "", key = parts.join("/");
 
     if (!seg) { html = renderHome(); }
-    else if (seg === "galeria") { html = renderGallery(arg); title = (arg ? catName(arg) : "Galería") + " — " + SITE.name; }
-    else if (seg === "foto") { const p = photoById(arg); html = renderPhoto(arg); if (p) title = p.title + " — " + SITE.name; }
-    else if (seg === "sobre-mi") { html = renderAbout(); title = "Sobre mí — " + SITE.name; }
-    else if (seg === "contacto") { html = renderContact(params); title = "Contacto — " + SITE.name; key += "?" + params.toString(); }
+    else if (seg === "gallery") { html = renderGallery(arg); title = (arg ? catName(arg) : "Gallery") + " — " + SITE.name; }
+    else if (seg === "photo") { const p = photoById(arg); html = renderPhoto(arg); if (p) title = p.title + " — " + SITE.name; }
+    else if (seg === "about") { html = renderAbout(); title = "About — " + SITE.name; }
+    else if (seg === "contact") { html = renderContact(params); title = "Contact — " + SITE.name; key += "?" + params.toString(); }
     else { html = renderNotFound(); }
 
     if (key === currentKey) return;
@@ -361,10 +361,10 @@
 
   function curtainLabelFor(seg, arg) {
     if (!seg) return SITE.name || "";
-    if (seg === "galeria") return arg ? catName(arg) : "Galería";
-    if (seg === "foto") { const p = photoById(arg); return p ? p.title : ""; }
-    if (seg === "sobre-mi") return "Sobre mí";
-    if (seg === "contacto") return "Hablemos";
+    if (seg === "gallery") return arg ? catName(arg) : "Gallery";
+    if (seg === "photo") { const p = photoById(arg); return p ? p.title : ""; }
+    if (seg === "about") return "About";
+    if (seg === "contact") return "Let's talk";
     return "404";
   }
 
@@ -376,9 +376,9 @@
     });
     app.querySelectorAll("[data-split]").forEach(splitWords);
     initParallax();
-    if (seg === "galeria") initViewToggle();
-    if (seg === "foto") initMap();
-    if (seg === "contacto") initForm();
+    if (seg === "gallery") initViewToggle();
+    if (seg === "photo") initMap();
+    if (seg === "contact") initForm();
   }
 
   /* ------------------------------------------------------ pantalla de carga */
@@ -448,7 +448,7 @@
   window.addEventListener("resize", updateParallax);
 
   /* -------------------------------------------------------------- reloj */
-  function clockNow() { return new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" }); }
+  function clockNow() { return new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" }); }
   setInterval(() => { const c = document.getElementById("clock"); if (c) c.textContent = clockNow(); }, 1000);
 
   /* ------------------------------------------------------------ cursor */
@@ -503,7 +503,7 @@
     const lat = parseFloat(el.dataset.lat), lng = parseFloat(el.dataset.lng), name = el.dataset.name;
     const osmLink = "https://www.openstreetmap.org/?mlat=" + lat + "&mlon=" + lng + "#map=11/" + lat + "/" + lng;
     const fallback = () => {
-      el.innerHTML = '<div class="map__fallback"><span>' + esc(name) + "<br>" + fmtCoord(lat, lng) + '<br><br><a class="link" href="' + osmLink + '" target="_blank" rel="noopener">Abrir en OpenStreetMap</a></span></div>';
+      el.innerHTML = '<div class="map__fallback"><span>' + esc(name) + "<br>" + fmtCoord(lat, lng) + '<br><br><a class="link" href="' + osmLink + '" target="_blank" rel="noopener">Open in OpenStreetMap</a></span></div>';
     };
     loadLeaflet().then((L) => {
       if (!document.body.contains(el)) return;
@@ -528,7 +528,7 @@
       e.preventDefault();
       status.classList.remove("is-error");
       if (!form.checkValidity()) {
-        status.textContent = "Revisa el nombre, el email y el mensaje antes de enviar.";
+        status.textContent = "Please check the name, email and message before sending.";
         status.classList.add("is-error");
         return;
       }
@@ -537,23 +537,23 @@
       if (SITE.formspreeId) {
         const btn = form.querySelector("button[type=submit]");
         btn.disabled = true;
-        status.textContent = "Enviando…";
+        status.textContent = "Sending…";
         try {
           const res = await fetch("https://formspree.io/f/" + SITE.formspreeId, { method: "POST", body: data, headers: { Accept: "application/json" } });
           if (!res.ok) throw new Error("HTTP " + res.status);
           form.reset();
-          status.textContent = "Gracias. Tu mensaje ha llegado, te respondo en cuanto pueda.";
+          status.textContent = "Thank you. Your message has arrived, I will reply as soon as I can.";
         } catch (err) {
-          status.textContent = "No se ha podido enviar. Escríbeme directamente a " + (SITE.email || "mi correo") + ".";
+          status.textContent = "It could not be sent. Please write to me directly at " + (SITE.email || "my email") + ".";
           status.classList.add("is-error");
         } finally { btn.disabled = false; }
         return;
       }
-      const subject = data.get("_subject") || "Mensaje desde la web";
-      const body = ["Nombre: " + data.get("name"), "Email: " + data.get("email"), "Motivo: " + data.get("motivo"),
-        data.get("fotografia") ? "Fotografía: " + data.get("fotografia") : "", "", data.get("message")].filter((l) => l !== "").join("\n");
+      const subject = data.get("_subject") || "Message from the website";
+      const body = ["Name: " + data.get("name"), "Email: " + data.get("email"), "Subject: " + data.get("subject"),
+        data.get("photograph") ? "Photograph: " + data.get("photograph") : "", "", data.get("message")].filter((l) => l !== "").join("\n");
       window.location.href = "mailto:" + encodeURIComponent(SITE.email || "") + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
-      status.textContent = "Se está abriendo tu aplicación de correo. Si no ocurre nada, escríbeme a " + (SITE.email || "mi correo") + ".";
+      status.textContent = "Your email app is opening. If nothing happens, write to me at " + (SITE.email || "my email") + ".";
     });
   }
 
@@ -565,8 +565,8 @@
   }
   function paintThemeLabel() {
     const l = themeBtn.querySelector("[data-theme-label]");
-    if (l) l.textContent = currentTheme() === "dark" ? "Oscuro" : "Claro";
-    themeBtn.setAttribute("aria-label", currentTheme() === "dark" ? "Cambiar a tema claro" : "Cambiar a tema oscuro");
+    if (l) l.textContent = currentTheme() === "dark" ? "Dark" : "Light";
+    themeBtn.setAttribute("aria-label", currentTheme() === "dark" ? "Switch to light theme" : "Switch to dark theme");
   }
   function applyTheme(t) {
     root.classList.add("theme-switching"); setTimeout(() => root.classList.remove("theme-switching"), 500);

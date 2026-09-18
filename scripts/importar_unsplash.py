@@ -78,13 +78,13 @@ def categorize(p):
     ex = p.get("exif") or {}
     make = (ex.get("make") or "").lower(); model = (ex.get("model") or "").lower()
     if re.search(r"\b(moon|luna|lunar|supermoon|superluna|eclipse|crescent|creciente|menguante)\b", text):
-        return "luna"
+        return "moon"
     if "dji" in make or "dji" in model or "mavic" in model or "hasselblad" in make or "hasselblad" in model \
        or re.search(r"\b(drone|dron|aerial|aérea|aerea|from above|top view|bird'?s[- ]eye|cenital|overhead)\b", text):
         return "drone"
     if re.search(r"\b(night|noche|nocturn\w*|milky way|vía láctea|via lactea|stars?|estrellas?|star trails?|circumpolar|astro\w*|long exposure|larga exposición|aurora|galaxy|galaxia)\b", text):
-        return "nocturnas"
-    return "paisaje"
+        return "night"
+    return "landscape"
 
 def title_for(p):
     d = clean(p.get("description"))
@@ -118,7 +118,7 @@ def fmt_exif(ex):
     focal = ex.get("focal_length"); aperture = ex.get("aperture"); exp = ex.get("exposure_time"); iso = ex.get("iso")
     return {
         "camera": camera,
-        "lens": clean(ex.get("name")) if clean(ex.get("name")) and clean(ex.get("name")) != camera else "",
+        "lens": "",  # Unsplash no informa del objetivo (exif.name es el nombre de la cámara)
         "focal": (str(focal).rstrip("0").rstrip(".") + " mm") if focal else "",
         "aperture": ("f/" + str(aperture)) if aperture else "",
         "shutter": (str(exp) + " s") if exp else "",
@@ -223,12 +223,12 @@ def entry_js(e):
          js_str(ex["camera"]), js_str(ex["lens"]), js_str(ex["focal"]), js_str(ex["aperture"]), js_str(ex["shutter"]), js_str(ex["iso"]),
          "true" if e.get("featured") else "false", "false" if e.get("forSale") is False else "true", js_str(e.get("unsplashId", "")))
 
-block = ("/* PHOTOS:START — el workflow «Importar fotos de Unsplash» añade aquí las fotos nuevas y respeta las ya editadas */\n"
+block = ("/* PHOTOS:START — the «Import photos from Unsplash» workflow adds new photos here and keeps edited ones */\n"
          "window.PHOTOS = [\n" + ",\n".join(entry_js(e) for e in all_entries) + "\n];\n/* PHOTOS:END */\n")
 src = open(PHOTOS_JS, encoding="utf-8").read()
 m = re.search(r"/\* PHOTOS:START.*?/\* PHOTOS:END \*/\n?", src, re.S)
 if not m:
     sys.exit("No se encuentran los marcadores PHOTOS:START / PHOTOS:END en js/photos.js")
 open(PHOTOS_JS, "w", encoding="utf-8").write(src[:m.start()] + block + src[m.end():])
-print("Añadidas %d fotos nuevas (total %d). Series de las nuevas: %s" % (len(entries), len(all_entries), {c: sum(1 for e in entries if e["category"] == c) for c in ("paisaje", "luna", "drone", "nocturnas")}))
+print("Añadidas %d fotos nuevas (total %d). Series de las nuevas: %s" % (len(entries), len(all_entries), {c: sum(1 for e in entries if e["category"] == c) for c in ("landscape", "moon", "drone", "night")}))
 print("Revisa js/photos.js: las fotos nuevas llegan con título y descripción automáticos en inglés y serie estimada.")
