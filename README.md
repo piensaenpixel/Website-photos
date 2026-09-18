@@ -9,7 +9,7 @@ Portfolio fotográfico estático (HTML, CSS y JavaScript sin dependencias ni bui
 - Tema claro y oscuro: sigue el ajuste del sistema y se puede cambiar con el botón redondo de la cabecera (se recuerda la elección).
 - Portada con foto a pantalla completa, selección de fotos grandes una debajo de otra e índice de series.
 - Cuatro series: **Paisaje**, **Luna**, **Drone** y **Nocturnas**, con galería filtrable en rejilla ordenada o en vista grande (botones a la derecha de los filtros).
-- Transiciones suaves entre páginas y aparición de las fotos al hacer scroll.
+- Animaciones: pantalla de carga con el nombre (una vez por visita), cortina entre páginas con el título del destino, títulos que aparecen palabra a palabra, fotos que se descubren al hacer scroll, parallax en la portada, marquesina y cursor personalizado con «Ver» sobre las fotos. Todo se desactiva si el sistema tiene «reducir movimiento» activado.
 - Página por fotografía con título, descripción, ficha técnica (cámara, objetivo, focal, apertura, velocidad, ISO, fecha), mapa de dónde está hecha y botón «Quiero esta foto» que lleva al formulario de contacto con la foto ya indicada.
 - Página «Sobre mí» y formulario de contacto.
 - Navegación por hash (`#/galeria/luna`, `#/foto/id`...), así que funciona en GitHub Pages sin configuración extra.

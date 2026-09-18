@@ -51,7 +51,7 @@
   function card(p, i) {
     const loc = p.location && p.location.name ? p.location.name : catName(p.category);
     return (
-      '<a class="card sr sr-img' + (p.h > p.w ? " card--portrait" : "") + '" style="--i:' + (i || 0) + '" href="#/foto/' + esc(p.id) + '">' +
+      '<a class="card sr sr-img' + (p.h > p.w ? " card--portrait" : "") + '" style="--i:' + (i || 0) + '" href="#/foto/' + esc(p.id) + '" data-cursor="Ver">' +
         '<div class="card__frame">' + imgTag(p, "", 'loading="lazy"') + "</div>" +
         '<div class="card__meta"><span class="card__title">' + esc(p.title) + '</span><span class="card__loc">' + esc(loc) + "</span></div>" +
       "</a>"
@@ -83,13 +83,14 @@
     }).join("");
 
     const feed = featured.slice(0, 8).map((p, i) => feedItem(p, i)).join("");
+    const marquee = CATEGORIES.map((c) => "<span>" + esc(c.name) + "</span>").join("") + "<span>Copias de edición limitada</span><span>Madrid</span>";
 
     return (
       '<section class="hero">' +
         '<img class="hero__img" src="' + esc(hero.src) + '" alt="' + esc(hero.alt || hero.title) + '">' +
-        '<p class="eyebrow eyebrow--accent hero__eyebrow reveal">Paisaje · Luna · Drone · Nocturnas</p>' +
-        '<h1 class="hero__title reveal" style="--i:1">Piensa <em>en</em> Pixel</h1>' +
-        '<div class="hero__bottom reveal" style="--i:2">' +
+        '<p class="eyebrow eyebrow--accent hero__eyebrow sr">Paisaje · Luna · Drone · Nocturnas</p>' +
+        '<h1 class="hero__title split" style="--i:1"><span class="w"><span class="w__i" style="--d:0">Piensa</span></span> <span class="w"><span class="w__i" style="--d:90"><em>en</em></span></span> <span class="w"><span class="w__i" style="--d:180">Pixel</span></span></h1>' +
+        '<div class="hero__bottom sr" style="--i:2">' +
           '<p class="hero__tagline">' + esc(SITE.tagline || "") + "</p>" +
           '<p class="hero__caption"><a href="#/foto/' + esc(hero.id) + '">' + esc(hero.title) + "</a>" + (hero.location && hero.location.name ? " · " + esc(hero.location.name) : "") + "</p>" +
         "</div>" +
@@ -97,9 +98,11 @@
       "</section>" +
 
       '<section class="feed">' +
-        '<div class="feed__head sr"><h2 class="feed__title">Selección</h2><a class="link-u" href="#/galeria">Toda la galería</a></div>' +
+        '<div class="feed__head sr"><h2 class="feed__title split" data-split>Selección</h2><a class="link-u" href="#/galeria">Toda la galería</a></div>' +
         feed +
       "</section>" +
+
+      '<div class="marquee" aria-hidden="true"><div class="marquee__track">' + marquee + marquee + "</div></div>" +
 
       '<section class="series" id="series">' +
         '<div class="series__head sr"><span class="eyebrow">Series</span><span class="eyebrow">' + PHOTOS.length + " fotografías</span></div>" +
@@ -118,7 +121,7 @@
   function feedItem(p, i) {
     const portrait = p.h > p.w;
     return (
-      '<a class="feed__item sr sr-img' + (portrait ? " feed__item--portrait" : "") + '" href="#/foto/' + esc(p.id) + '">' +
+      '<a class="feed__item sr sr-img' + (portrait ? " feed__item--portrait" : "") + '" href="#/foto/' + esc(p.id) + '" data-cursor="Ver">' +
         '<div class="feed__media">' + imgTag(p, "", i === 0 ? "" : 'loading="lazy"') + "</div>" +
         '<div class="feed__caption">' +
           '<span class="feed__num">' + pad(i + 1) + "</span>" +
@@ -150,13 +153,13 @@
     return (
       '<section class="page">' +
         '<div class="page-head">' +
-          '<p class="eyebrow reveal">' + (c ? "Serie " + pad(CATEGORIES.indexOf(c) + 1) : "Archivo") + " · " + list.length + (list.length === 1 ? " fotografía" : " fotografías") + "</p>" +
-          '<h1 class="page-head__title reveal" style="--i:1">' + esc(c ? c.name : "Galería") + "</h1>" +
-          (c ? '<p class="page-head__intro reveal" style="--i:2">' + esc(c.intro) + "</p>" : "") +
-          '<div class="page-head__meta reveal" style="--i:3"><nav class="filters" aria-label="Series">' + filters + "</nav>" + toggle + "</div>" +
+          '<p class="eyebrow sr">' + (c ? "Serie " + pad(CATEGORIES.indexOf(c) + 1) : "Archivo") + " · " + list.length + (list.length === 1 ? " fotografía" : " fotografías") + "</p>" +
+          '<h1 class="page-head__title split" data-split style="--i:1">' + esc(c ? c.name : "Galería") + "</h1>" +
+          (c ? '<p class="page-head__intro sr" style="--i:2">' + esc(c.intro) + "</p>" : "") +
+          '<div class="page-head__meta sr" style="--i:3"><nav class="filters" aria-label="Series">' + filters + "</nav>" + toggle + "</div>" +
         "</div>" +
         (list.length
-          ? '<div class="grid' + (view === "large" ? " grid--large" : "") + '" id="gallery-grid">' + list.map((p, i) => card(p, Math.min(i, 8))).join("") + "</div>"
+          ? '<div class="grid' + (view === "large" ? " grid--large" : "") + '" id="gallery-grid">' + list.map((p, i) => card(p, i % 3)).join("") + "</div>"
           : '<p class="empty">Aún no hay fotografías en esta serie.</p>') +
       "</section>"
     );
@@ -211,22 +214,22 @@
         "</div>" +
         '<div class="photo__body">' +
           "<div>" +
-            '<p class="eyebrow eyebrow--accent reveal">' + esc(catName(p.category)) + (p.date ? " · " + esc(fmtDate(p.date)) : "") + "</p>" +
-            '<h1 class="photo__title reveal" style="--i:1">' + esc(p.title) + "</h1>" +
-            '<div class="photo__desc reveal" style="--i:2">' + paragraphs(p.description) + "</div>" +
-            '<div class="photo__actions reveal" style="--i:3">' +
+            '<p class="eyebrow eyebrow--accent sr">' + esc(catName(p.category)) + (p.date ? " · " + esc(fmtDate(p.date)) : "") + "</p>" +
+            '<h1 class="photo__title split" data-split style="--i:1">' + esc(p.title) + "</h1>" +
+            '<div class="photo__desc sr" style="--i:2">' + paragraphs(p.description) + "</div>" +
+            '<div class="photo__actions sr" style="--i:3">' +
               (p.forSale !== false ? '<a class="btn btn--solid" href="#/contacto?foto=' + encodeURIComponent(p.id) + '">Quiero esta foto <span class="btn__arrow">→</span></a>' : "") +
               (hasMap ? '<a class="btn" href="#mapa" data-scroll="mapa">Ver en el mapa</a>' : "") +
               (p.forSale !== false ? '<p class="photo__actions-note">Copias de edición limitada sobre papel fine art. Escríbeme y te cuento tamaños, acabados y precios.</p>' : "") +
             "</div>" +
           "</div>" +
           "<aside>" +
-            '<div class="spec reveal" style="--i:2">' +
+            '<div class="spec">' +
               '<div class="spec__head"><h2 class="spec__title">Ficha técnica</h2><span class="eyebrow">EXIF</span></div>' +
-              (rows.length ? "<dl>" + rows.map((r) => "<dt>" + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd>").join("") + "</dl>" : '<p class="eyebrow">Sin datos</p>') +
+              (rows.length ? "<dl>" + rows.map((r, i) => '<dt class="sr" style="--i:' + (i + 2) + '">' + esc(r[0]) + '</dt><dd class="sr" style="--i:' + (i + 2) + '">' + esc(r[1]) + "</dd>").join("") + "</dl>" : '<p class="eyebrow">Sin datos</p>') +
             "</div>" +
             (hasMap
-              ? '<div class="map reveal" id="mapa" style="--i:3">' +
+              ? '<div class="map sr" id="mapa" style="--i:3">' +
                   '<div class="map__head"><h2 class="map__title">' + esc(p.location.name || "Localización") + '</h2><span class="map__coords">' + fmtCoord(p.location.lat, p.location.lng) + "</span></div>" +
                   '<div class="map__canvas" id="map-canvas" data-lat="' + p.location.lat + '" data-lng="' + p.location.lng + '" data-name="' + esc(p.location.name || "") + '">' +
                     '<div class="map__fallback">Cargando mapa…</div>' +
@@ -249,12 +252,12 @@
     return (
       '<section class="page">' +
         '<div class="page-head">' +
-          '<p class="eyebrow reveal">Sobre mí</p>' +
-          '<h1 class="page-head__title reveal" style="--i:1">' + esc(SITE.author || SITE.name) + "</h1>" +
+          '<p class="eyebrow sr">Sobre mí</p>' +
+          '<h1 class="page-head__title split" data-split style="--i:1">' + esc(SITE.author || SITE.name) + "</h1>" +
         "</div>" +
         '<div class="about">' +
-          '<div class="about__portrait reveal" style="--i:1">' + (portrait ? imgTag(portrait, "") : "") + "</div>" +
-          '<div class="about__text reveal" style="--i:2">' + paras +
+          '<div class="about__portrait sr" style="--i:1">' + (portrait ? imgTag(portrait, "") : "") + "</div>" +
+          '<div class="about__text sr" style="--i:2">' + paras +
             '<div class="about__links">' +
               (SITE.instagram ? '<a class="btn" href="' + esc(SITE.instagram) + '" target="_blank" rel="noopener">Instagram</a>' : "") +
               (SITE.unsplash ? '<a class="btn" href="' + esc(SITE.unsplash) + '" target="_blank" rel="noopener">Unsplash</a>' : "") +
@@ -282,12 +285,12 @@
     return (
       '<section class="page">' +
         '<div class="page-head">' +
-          '<p class="eyebrow reveal">Contacto</p>' +
-          '<h1 class="page-head__title reveal" style="--i:1">Hablemos</h1>' +
-          '<p class="page-head__intro reveal" style="--i:2">Si quieres una copia, una licencia o simplemente comentar algo de una foto, este es el sitio. Suelo responder en un par de días.</p>' +
+          '<p class="eyebrow sr">Contacto</p>' +
+          '<h1 class="page-head__title split" data-split style="--i:1">Hablemos</h1>' +
+          '<p class="page-head__intro sr" style="--i:2">Si quieres una copia, una licencia o simplemente comentar algo de una foto, este es el sitio. Suelo responder en un par de días.</p>' +
         "</div>" +
         '<div class="contact">' +
-          '<aside class="contact__aside reveal" style="--i:2">' +
+          '<aside class="contact__aside sr" style="--i:2">' +
             "<p>Las copias se imprimen bajo pedido en papel fine art de algodón, en ediciones limitadas y numeradas. Dime qué foto te interesa y el tamaño aproximado y te paso opciones y precio.</p>" +
             (p
               ? '<a class="contact__photo" href="#/foto/' + esc(p.id) + '">' + '<img src="' + esc(p.src) + '" alt="">' + "<div><strong>" + esc(p.title) + "</strong><span>" + esc(catName(p.category)) + (p.location && p.location.name ? " · " + esc(p.location.name) : "") + "</span></div></a>"
@@ -298,7 +301,7 @@
               (SITE.unsplash ? '<a href="' + esc(SITE.unsplash) + '" target="_blank" rel="noopener">piensaenpixel<span>Unsplash</span></a>' : "") +
             "</div>" +
           "</aside>" +
-          '<form class="form reveal" id="contact-form" style="--i:3" novalidate>' +
+          '<form class="form sr" id="contact-form" style="--i:3" novalidate>' +
             '<div class="form__row">' +
               '<div class="field"><label for="f-name">Nombre</label><input id="f-name" name="name" type="text" placeholder="Tu nombre" required autocomplete="name"></div>' +
               '<div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" placeholder="tu@correo.com" required autocomplete="email"></div>' +
@@ -324,9 +327,9 @@
   function renderNotFound() {
     return (
       '<section class="page"><div class="page-head">' +
-        '<p class="eyebrow reveal">404</p>' +
-        '<h1 class="page-head__title reveal" style="--i:1">Nada por aquí</h1>' +
-        '<p class="page-head__intro reveal" style="--i:2">Esa página no existe. <a class="link-u" href="#/galeria">Vuelve a la galería</a>.</p>' +
+        '<p class="eyebrow sr">404</p>' +
+        '<h1 class="page-head__title split" data-split style="--i:1">Nada por aquí</h1>' +
+        '<p class="page-head__intro sr" style="--i:2">Esa página no existe. <a class="link-u" href="#/galeria">Vuelve a la galería</a>.</p>' +
       "</div></section>"
     );
   }
@@ -362,16 +365,62 @@
     closeMenu();
 
     const swap = () => {
-      app.classList.remove("is-leaving");
       app.innerHTML = html;
-      window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
-      app.classList.add("is-entering");
-      setTimeout(() => app.classList.remove("is-entering"), 700);
+      window.scrollTo({ top: 0, behavior: "instant" });
       afterRender(seg);
     };
 
-    if (first) { swap(); }
-    else { app.classList.add("is-leaving"); setTimeout(swap, 220); }
+    if (first) {
+      swap();
+      runLoader(() => startReveals());
+    } else {
+      const label = curtainLabelFor(seg, arg);
+      curtainLabel.textContent = label;
+      curtain.classList.remove("is-out");
+      curtain.classList.add("is-in");
+      setTimeout(() => {
+        swap();
+        curtain.classList.remove("is-in");
+        curtain.classList.add("is-out");
+        setTimeout(startReveals, 250);
+        setTimeout(() => curtain.classList.remove("is-out"), 700);
+      }, 520);
+    }
+  }
+
+  function curtainLabelFor(seg, arg) {
+    if (!seg) return SITE.name || "";
+    if (seg === "galeria") return arg ? catName(arg) : "Galería";
+    if (seg === "foto") { const p = photoById(arg); return p ? p.title : ""; }
+    if (seg === "sobre-mi") return "Sobre mí";
+    if (seg === "contacto") return "Hablemos";
+    return "";
+  }
+
+  /* ------------------------------------------------------ pantalla de carga */
+  const loader = document.getElementById("loader");
+  const curtain = document.getElementById("curtain");
+  const curtainLabel = document.getElementById("curtain-label");
+
+  function runLoader(done) {
+    let seen = false;
+    try { seen = sessionStorage.getItem("loaded") === "1"; sessionStorage.setItem("loaded", "1"); } catch (e) {}
+    const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (seen || reduce) { loader.hidden = true; done(); return; }
+    requestAnimationFrame(() => loader.classList.add("is-loading"));
+    const heroImg = app.querySelector(".hero__img");
+    const minTime = new Promise((r) => setTimeout(r, 1500));
+    const imgReady = new Promise((r) => {
+      if (!heroImg || heroImg.complete) return r();
+      heroImg.addEventListener("load", r, { once: true });
+      heroImg.addEventListener("error", r, { once: true });
+      setTimeout(r, 4000);
+    });
+    Promise.all([minTime, imgReady]).then(() => {
+      loader.classList.add("is-done");
+      setTimeout(done, 350);
+      setTimeout(() => { loader.hidden = true; }, 1000);
+    });
   }
 
   function afterRender(seg) {
@@ -382,7 +431,8 @@
       else { img.addEventListener("load", done, { once: true }); img.addEventListener("error", done, { once: true }); }
     });
 
-    observeReveals();
+    app.querySelectorAll("[data-split]").forEach(splitWords);
+    initParallax();
     if (!seg) initSeriesPreview();
     if (seg === "galeria") initViewToggle();
     if (seg === "foto") { initMap(); initScrollLinks(); }
@@ -391,17 +441,77 @@
 
   /* ------------------------------------------- aparición al hacer scroll */
   let observer = null;
-  function observeReveals() {
+  function startReveals() {
     if (observer) observer.disconnect();
-    const els = app.querySelectorAll(".sr");
+    const els = app.querySelectorAll(".sr, .split");
     if (!("IntersectionObserver" in window)) { els.forEach((el) => el.classList.add("is-in")); return; }
     observer = new IntersectionObserver((entries) => {
       entries.forEach((en) => {
         if (en.isIntersecting) { en.target.classList.add("is-in"); observer.unobserve(en.target); }
       });
-    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+    }, { rootMargin: "0px 0px -6% 0px", threshold: 0.05 });
     els.forEach((el) => observer.observe(el));
   }
+
+  function splitWords(el) {
+    if (el.dataset.splitDone) return;
+    const words = el.textContent.trim().split(/\s+/);
+    el.innerHTML = words.map((w, i) => '<span class="w"><span class="w__i" style="--d:' + (i * 70) + '">' + esc(w) + "</span></span>").join(" ");
+    el.dataset.splitDone = "1";
+  }
+
+  /* --------------------------------------------------------- parallax */
+  let parallaxEls = [];
+  let ticking = false;
+  function initParallax() {
+    parallaxEls = Array.from(app.querySelectorAll(".feed__media img"));
+    updateParallax();
+  }
+  function updateParallax() {
+    if (!parallaxEls.length) return;
+    const vh = window.innerHeight;
+    parallaxEls.forEach((img) => {
+      const r = img.parentElement.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > vh) return;
+      const centre = (r.top + r.height / 2 - vh / 2) / vh; // -1 .. 1
+      img.style.setProperty("--py", (centre * -0.06 * r.height).toFixed(1) + "px");
+    });
+  }
+  window.addEventListener("scroll", () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => { updateParallax(); ticking = false; });
+  }, { passive: true });
+  window.addEventListener("resize", updateParallax);
+
+  /* ------------------------------------------------------------ cursor */
+  const cursor = document.getElementById("cursor");
+  const cursorLabel = document.getElementById("cursor-label");
+  (function initCursor() {
+    if (!window.matchMedia || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    let x = window.innerWidth / 2, y = window.innerHeight / 2, cx = x, cy = y, raf = null;
+    const move = () => {
+      cx += (x - cx) * 0.22; cy += (y - cy) * 0.22;
+      cursor.style.left = cx + "px"; cursor.style.top = cy + "px";
+      if (Math.abs(x - cx) > 0.2 || Math.abs(y - cy) > 0.2) raf = requestAnimationFrame(move); else raf = null;
+    };
+    document.addEventListener("mousemove", (e) => {
+      x = e.clientX; y = e.clientY;
+      cursor.classList.remove("is-hidden");
+      if (!raf) raf = requestAnimationFrame(move);
+      const t = e.target.closest ? e.target.closest("[data-cursor], a, button, .filters a, input, textarea, select") : null;
+      if (t && t.dataset && t.dataset.cursor) {
+        cursorLabel.textContent = t.dataset.cursor;
+        cursor.classList.add("is-view"); cursor.classList.remove("is-link");
+      } else if (t) {
+        cursor.classList.add("is-link"); cursor.classList.remove("is-view");
+      } else {
+        cursor.classList.remove("is-link", "is-view");
+      }
+    }, { passive: true });
+    document.addEventListener("mouseleave", () => cursor.classList.add("is-hidden"));
+    document.addEventListener("mouseenter", () => cursor.classList.remove("is-hidden"));
+  })();
 
   /* -------------------------------------------------- portada: previews */
   function initSeriesPreview() {

@@ -22,8 +22,8 @@
 
 window.SITE = {
   name: "Piensa en Pixel",
-  tagline: "Fotografía de paisaje, luna, dron y noche",
-  author: "Piensa en Pixel",
+  tagline: "Fotografía de paisaje, luna, dron y noche, desde Madrid",
+  author: "Emilio García",
   // Correo al que llegan los mensajes de contacto (se usa como
   // alternativa si no configuras Formspree).
   email: "piensaenpixel@gmail.com",
@@ -34,7 +34,7 @@ window.SITE = {
   unsplash: "https://unsplash.com/@piensaenpixel",
   about: [
     "Fotografío sobre todo lo que ocurre cuando la luz se va: la última hora en la montaña, la luna asomando tras una cresta, la Vía Láctea sobre un mar tranquilo.",
-    "Trabajo con cámara en mano, con dron y con teleobjetivo, casi siempre en España, buscando lugares que conozco bien y volviendo a ellos hasta que la luz acompaña.",
+    "Soy Emilio García, fotógrafo afincado en Madrid. Trabajo con cámara en mano, con dron y con teleobjetivo, casi siempre en España, buscando lugares que conozco bien y volviendo a ellos hasta que la luz acompaña.",
     "Todas las fotografías de esta web están disponibles como copias de edición limitada sobre papel fine art. Si te interesa alguna, escríbeme y te cuento tamaños, acabados y precios."
   ]
 };
