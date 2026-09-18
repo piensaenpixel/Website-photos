@@ -76,7 +76,6 @@
     const featured = PHOTOS.filter((p) => p.featured);
     const hero = featured.find((p) => p.w >= p.h) || PHOTOS[0];
     if (!hero) return '<section class="page"><p class="empty">Todavía no hay fotografías. Añádelas en js/photos.js.</p></section>';
-    const portrait = SITE.portrait ? { src: SITE.portrait, title: SITE.author, w: 1200, h: 1200 } : (PHOTOS.find((p) => p.h > p.w) || hero);
     const about = (SITE.about || [])[0] || "";
 
     return (
@@ -100,8 +99,6 @@
       '<section class="section">' + sectionHead("Sobre mí", 1) +
         '<div class="section__body">' +
           '<p class="copy t-muted sr">' + esc(about) + "</p>" +
-          '<div class="sr-img sr" style="margin: 48px 0 24px"><div class="media media--circle">' + img(portrait, 'loading="lazy"') + "</div></div>" +
-          '<div class="row sr"><span>Más:</span><a class="link" href="#/sobre-mi">Ver</a></div>' +
         "</div>" +
       "</section>" +
 
