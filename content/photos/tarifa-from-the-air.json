@@ -1,0 +1,24 @@
+{
+  "title": "Tarifa from the Air",
+  "category": "drone",
+  "src": "img/fotos/tarifa-from-the-air.jpg",
+  "description": "The Tarifa shoreline in portrait: foam, sand and turquoise water.",
+  "date": "2018-07-19",
+  "location": {
+    "name": "Tarifa, Cádiz, Spain",
+    "lat": 36.0142861,
+    "lng": -5.60444430000007
+  },
+  "exif": {
+    "camera": "DJI FC220",
+    "lens": "",
+    "focal": "4.7 mm",
+    "aperture": "f/2.2",
+    "shutter": "1/50 s",
+    "iso": "105"
+  },
+  "featured": false,
+  "forSale": true,
+  "unsplashId": "Yx_khCZyX8g",
+  "order": 10
+}

@@ -1,0 +1,24 @@
+{
+  "title": "Into the Pool",
+  "category": "drone",
+  "src": "img/fotos/into-the-pool.jpg",
+  "description": "Just before the dive: the pool in portrait from the drone.",
+  "date": "2019-08-19",
+  "location": {
+    "name": "",
+    "lat": null,
+    "lng": null
+  },
+  "exif": {
+    "camera": "",
+    "lens": "",
+    "focal": "",
+    "aperture": "",
+    "shutter": "",
+    "iso": ""
+  },
+  "featured": false,
+  "forSale": true,
+  "unsplashId": "eQfMpQ3WcVY",
+  "order": 11
+}

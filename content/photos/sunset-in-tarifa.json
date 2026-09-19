@@ -1,0 +1,24 @@
+{
+  "title": "Sunset in Tarifa",
+  "category": "landscape",
+  "src": "img/fotos/sunset-in-tarifa.jpg",
+  "description": "The sun sets over the sea on an empty beach in Tarifa, the volleyball net the only witness.",
+  "date": "2018-08-06",
+  "location": {
+    "name": "Tarifa, Cádiz, Spain",
+    "lat": 36.0104997,
+    "lng": -5.60274619999996
+  },
+  "exif": {
+    "camera": "Apple iPhone 8 Plus",
+    "lens": "",
+    "focal": "6.6 mm",
+    "aperture": "f/2.8",
+    "shutter": "1/607 s",
+    "iso": "20"
+  },
+  "featured": false,
+  "forSale": true,
+  "unsplashId": "ocOesQ7hTK8",
+  "order": 20
+}

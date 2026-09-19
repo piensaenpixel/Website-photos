@@ -1,6 +1,8 @@
-# Descarga las fotos del usuario de Unsplash con su API y las añade al sitio.
-# Se lanza a mano desde la pestaña Actions (o por API). La clave puede pasarse
-# como entrada o guardarse como secret UNSPLASH_ACCESS_KEY en el repositorio.
+# Descarga las fotos del usuario de Unsplash con su API y las añade al sitio
+# (una ficha JSON por foto en content/photos e imagen en img/fotos).
+# Se lanza a mano desde la pestaña Actions eligiendo la rama «staging», para
+# revisarlas en la web de staging antes de publicar. La clave puede pasarse
+# como entrada o guardarse como secret UNSPLASH_ACCESS_KEY.
 name: Importar fotos de Unsplash
 
 on:
@@ -48,7 +50,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A img/fotos js/photos.js
+          git add -A img/fotos content/photos content/excluded-unsplash.json
           if git diff --cached --quiet; then echo "Sin cambios"; exit 0; fi
           git commit -m "Importar fotos desde Unsplash"
           git push

@@ -1,0 +1,24 @@
+{
+  "title": "Tower Under the Stars",
+  "category": "night",
+  "src": "img/fotos/tower-under-the-stars.jpg",
+  "description": "A lone lit tower under a sky full of stars.",
+  "date": "2021-08-10",
+  "location": {
+    "name": "",
+    "lat": null,
+    "lng": null
+  },
+  "exif": {
+    "camera": "NIKON CORPORATION NIKON Z 6",
+    "lens": "",
+    "focal": "16 mm",
+    "aperture": "f/2.8",
+    "shutter": "20 s",
+    "iso": "3200"
+  },
+  "featured": false,
+  "forSale": true,
+  "unsplashId": "Ueyk0dAg1t0",
+  "order": 22
+}

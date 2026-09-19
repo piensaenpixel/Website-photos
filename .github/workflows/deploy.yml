@@ -1,11 +1,12 @@
-# Publica la web en la rama gh-pages cada vez que se hace push a main.
-# GitHub Pages sirve el contenido de esa rama en
-# https://piensaenpixel.github.io/Website-photos/
+# Publica la web en GitHub Pages (rama gh-pages):
+#   - la rama main      → https://piensaenpixel.github.io/Website-photos/
+#   - la rama staging   → https://piensaenpixel.github.io/Website-photos/staging/
+# Se ejecuta con cada push a main o staging, y también a mano.
 name: Publicar en GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [main, staging]
   workflow_dispatch:
 
 permissions:
@@ -19,15 +20,35 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Descargar el repositorio
+      - name: Descargar la rama main
         uses: actions/checkout@v4
+        with:
+          ref: main
+          path: src-main
 
-      - name: Preparar la carpeta a publicar
+      - name: Descargar la rama staging
+        uses: actions/checkout@v4
+        with:
+          ref: staging
+          path: src-staging
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar Pillow (para reducir imágenes)
+        run: pip install --quiet pillow
+
+      - name: Montar la web pública (main)
         run: |
-          mkdir -p _site
-          rsync -a --exclude '.git' --exclude '.github' --exclude '_site' --exclude 'README.md' --exclude 'scripts' ./ _site/
-          # Versión en los enlaces a CSS y JS para que el navegador no use copias antiguas
-          sed -i "s/?v=dev/?v=${GITHUB_SHA::8}/g" _site/index.html
+          MAIN_SHA=$(git -C src-main rev-parse --short=8 HEAD)
+          python3 src-main/scripts/build_site.py src-main _site --env production --version "$MAIN_SHA"
+
+      - name: Montar la web de staging
+        run: |
+          STAGING_SHA=$(git -C src-staging rev-parse --short=8 HEAD)
+          python3 src-staging/scripts/build_site.py src-staging _site/staging --env staging --version "$STAGING_SHA"
 
       - name: Publicar en la rama gh-pages
         uses: peaceiris/actions-gh-pages@v4
@@ -36,4 +57,4 @@ jobs:
           publish_dir: ./_site
           publish_branch: gh-pages
           force_orphan: true
-          commit_message: "Publicar web desde ${{ github.sha }}"
+          commit_message: "Publicar web (main ${{ github.sha }})"

@@ -1,0 +1,24 @@
+{
+  "title": "Milky Way over the Ermita de las Nieves",
+  "category": "night",
+  "src": "img/fotos/milky-way-over-the-ermita-de-las-nieves.jpg",
+  "description": "The galactic core rising right behind the Ermita de las Nieves, in Tenerife.",
+  "date": "2025-05-06",
+  "location": {
+    "name": "Ermita de las Nieves, Tenerife, Spain",
+    "lat": 28.291564,
+    "lng": -16.62913
+  },
+  "exif": {
+    "camera": "",
+    "lens": "",
+    "focal": "",
+    "aperture": "",
+    "shutter": "",
+    "iso": ""
+  },
+  "featured": true,
+  "forSale": true,
+  "unsplashId": "hk00YEJ6j64",
+  "order": 2
+}

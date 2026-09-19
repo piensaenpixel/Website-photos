@@ -1,0 +1,24 @@
+{
+  "title": "Plane and Waning Moon",
+  "category": "moon",
+  "src": "img/fotos/plane-and-waning-moon.jpg",
+  "description": "A plane's contrail passes beside the waning half moon in broad daylight.",
+  "date": "2021-10-12",
+  "location": {
+    "name": "",
+    "lat": null,
+    "lng": null
+  },
+  "exif": {
+    "camera": "NIKON CORPORATION NIKON Z 6",
+    "lens": "",
+    "focal": "600 mm",
+    "aperture": "f/6.3",
+    "shutter": "1/2000 s",
+    "iso": "800"
+  },
+  "featured": false,
+  "forSale": true,
+  "unsplashId": "cZTzhs",
+  "order": 21
+}

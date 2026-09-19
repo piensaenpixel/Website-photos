@@ -1,0 +1,24 @@
+{
+  "title": "Sunset over the Sea",
+  "category": "landscape",
+  "src": "img/fotos/sunset-over-the-sea.jpg",
+  "description": "The sun sinks below the horizon with the shoreline rocks in the foreground.",
+  "date": "2023-04-21",
+  "location": {
+    "name": "",
+    "lat": null,
+    "lng": null
+  },
+  "exif": {
+    "camera": "NIKON CORPORATION NIKON Z 6",
+    "lens": "",
+    "focal": "35 mm",
+    "aperture": "f/9.0",
+    "shutter": "1/13 s",
+    "iso": "125"
+  },
+  "featured": true,
+  "forSale": true,
+  "unsplashId": "89OJpvgo8Dg",
+  "order": 8
+}

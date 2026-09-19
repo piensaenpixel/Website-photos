@@ -1,0 +1,24 @@
+{
+  "title": "Shadows on the Shore",
+  "category": "drone",
+  "src": "img/fotos/shadows-on-the-shore.jpg",
+  "description": "The beach from above: the foam draws the shoreline and the shadows stretch the bathers.",
+  "date": "2021-08-08",
+  "location": {
+    "name": "",
+    "lat": null,
+    "lng": null
+  },
+  "exif": {
+    "camera": "DJI FC220",
+    "lens": "",
+    "focal": "4.7 mm",
+    "aperture": "f/2.2",
+    "shutter": "1/350 s",
+    "iso": "100"
+  },
+  "featured": false,
+  "forSale": true,
+  "unsplashId": "lzlVmgxrcaM",
+  "order": 9
+}

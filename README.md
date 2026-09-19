@@ -12,56 +12,65 @@ Portfolio fotográfico estático (HTML, CSS y JavaScript sin dependencias ni bui
 - Cuatro series: **Paisaje**, **Luna**, **Drone** y **Nocturnas**, con galería filtrable en vista grande (una debajo de otra) o rejilla.
 - Página por fotografía con título grande, ficha etiqueta/valor (serie, lugar, fecha, cámara, objetivo, focal, apertura, velocidad, ISO), enlace «Copia: quiero esta foto» al formulario, imagen a todo el ancho, descripción, mapa y navegación anterior/siguiente.
 - Animaciones: pantalla de carga (una vez por visita), fundido suave entre páginas, títulos que entran palabra a palabra, fotos que se descubren al hacer scroll, parallax en las listas y cursor personalizado con «Ver». Todo se desactiva con «reducir movimiento».
+- Panel de administración en `/admin` (Sveltia CMS) y web de staging en `/staging/`.
 - Toda la interfaz está en inglés. Navegación por hash (`#/gallery/moon`, `#/photo/id`...), así que funciona en GitHub Pages sin configuración extra.
+
+## Cómo se gestiona el contenido
+
+Todo el contenido vive en la carpeta `content/`, en archivos JSON pequeños que edita el panel de administración:
+
+| Qué | Dónde |
+|---|---|
+| Datos del sitio (nombre, email, textos de About, tamaños de copia…) | `content/site.json` |
+| Series | `content/series/<id>.json` |
+| Fotografías | `content/photos/<id>.json` (la imagen en `img/fotos/`) |
+| Cursos | `content/courses/<id>.json` |
+| Fotos de Unsplash descartadas | `content/excluded-unsplash.json` |
+
+Al publicar, el script `scripts/build_data.py` junta esos archivos en `js/data.js` (calculando el tamaño de cada imagen) y `scripts/build_site.py` monta la web y reduce las imágenes grandes a 2000 px. En local: `python3 scripts/build_data.py` y luego `python3 -m http.server 8080`.
+
+## Panel de administración (CMS)
+
+El panel está en **https://piensaenpixel.github.io/Website-photos/admin/** y usa [Sveltia CMS](https://github.com/sveltia/sveltia-cms). Entras con tu cuenta de GitHub y editas fotos, series, cursos y ajustes con formularios; al guardar, hace el commit en la rama `staging`.
+
+**Flujo de trabajo**
+
+1. Editas en el panel → se guarda en `staging` → en un par de minutos lo ves en **https://piensaenpixel.github.io/Website-photos/staging/** (lleva la marca «Staging» en la barra y los buscadores no la indexan).
+2. Cuando te guste, publicas: en GitHub, pestaña **Actions → «Publicar staging en la web» → Run workflow**. Eso pasa los cambios a `main` y regenera la web pública.
+
+**Configuración inicial (una sola vez, unos 10 minutos)**
+
+El panel necesita un pequeño servicio de login para GitHub. Es gratuito:
+
+1. Crea una cuenta en [Cloudflare](https://dash.cloudflare.com/sign-up) si no la tienes.
+2. Entra en https://github.com/sveltia/sveltia-cms-auth y pulsa el botón **Deploy to Cloudflare Workers**. Al terminar tendrás una URL del tipo `https://sveltia-cms-auth.TU-USUARIO.workers.dev`.
+3. En GitHub: **Settings → Developer settings → OAuth Apps → New OAuth App**. Rellena:
+   - Application name: `piensaenpixel admin`
+   - Homepage URL: `https://piensaenpixel.github.io/Website-photos/`
+   - Authorization callback URL: `https://sveltia-cms-auth.TU-USUARIO.workers.dev/callback`
+   Guarda, copia el **Client ID** y genera un **Client secret** (cópialo también).
+4. En Cloudflare, abre el worker → **Settings → Variables and Secrets** y añade:
+   - `GITHUB_CLIENT_ID` = el Client ID
+   - `GITHUB_CLIENT_SECRET` = el Client secret
+   - `ALLOWED_DOMAINS` = `piensaenpixel.github.io`
+5. En `admin/config.yml`, sustituye `https://sveltia-cms-auth.REEMPLAZA.workers.dev` por la URL de tu worker (o pásasela a Claude y lo hace).
+
+A partir de ahí, https://piensaenpixel.github.io/Website-photos/admin/ te pedirá entrar con GitHub y ya está.
 
 ## Importar fotos desde Unsplash
 
-El workflow **Importar fotos de Unsplash** (pestaña Actions → Run workflow) descarga con la API las fotos más populares del usuario, sus datos EXIF y su localización, las guarda en `img/fotos/` y las añade a `js/photos.js`. Cómo se comporta:
+El workflow **Importar fotos de Unsplash** (Actions → Run workflow, eligiendo la rama `staging`) descarga con la API las fotos más populares del usuario, sus datos EXIF y su localización, guarda la imagen en `img/fotos/` y crea la ficha en `content/photos/`. Cómo se comporta:
 
-- Las fotos que ya están en `js/photos.js` (por su `unsplashId`) no se tocan, así que puedes editar títulos, series y descripciones sin miedo a perderlos.
-- Las fotos listadas en `EXCLUDED_UNSPLASH` al final de `js/photos.js` se ignoran. Para descartar una foto, borra su entrada y añade su `unsplashId` a esa lista.
-- Las fotos nuevas llegan con título y descripción automáticos en inglés y serie estimada por palabras clave: revísalas.
-- La clave se pasa como entrada del workflow o, mejor, como secret del repositorio llamado `UNSPLASH_ACCESS_KEY` (Settings → Secrets and variables → Actions). Las apps de Unsplash en modo demo permiten 50 peticiones por hora, unas 45 fotos por ejecución.
+- Las fotos que ya tienen ficha (por su `unsplashId`) no se tocan, así que puedes editarlas en el panel sin miedo.
+- Las fotos listadas en `content/excluded-unsplash.json` se ignoran. Para descartar una, borra su ficha en el panel y añade su `unsplashId` a esa lista.
+- Las nuevas llegan con título y descripción automáticos en inglés y serie estimada por palabras clave: revísalas en el panel.
+- La clave se pasa como entrada del workflow o, mejor, como secret del repositorio llamado `UNSPLASH_ACCESS_KEY`. Las apps de Unsplash en modo demo permiten 50 peticiones por hora, unas 45 fotos por ejecución.
 
-## Cómo añadir tus fotos a mano
+## Cursos y tamaños de copia
 
-1. Copia las imágenes a `img/fotos/` (JPG, entre 1600 y 2400 px en el lado largo es un buen equilibrio entre calidad y peso).
-2. Abre `js/photos.js` y añade una entrada al array `PHOTOS` por cada foto. El archivo explica cada campo; lo esencial:
+Los cursos se editan en el panel (colección Courses) y aparecen en la portada, en `#/courses` y como opción «Book a course» del formulario. Si no hay ninguno, la sección desaparece.
 
-```js
-{
-  id: "moon-over-teide",                 // único, sin espacios ni acentos (forma la URL)
-  title: "Moon over Teide",
-  category: "moon",                      // landscape | moon | drone | night
-  src: "img/fotos/luna-teide.jpg",
-  w: 2000, h: 1333,                      // ancho y alto en píxeles
-  description: "Free text, in English.\n\nYou can use several paragraphs.",
-  date: "2026-04-18",
-  location: { name: "Parque Nacional del Teide", lat: 28.2724, lng: -16.6425 },
-  exif: { camera: "Sony α7 IV", lens: "200-600 mm", focal: "600 mm", aperture: "f/8", shutter: "1/250 s", iso: "200" },
-  featured: true,                        // aparece en la portada
-  forSale: true                          // muestra el botón de compra
-}
-```
-
-3. Las fotos que hay ahora en `img/fotos/` son **imágenes de muestra generadas** para que la web no esté vacía. Bórralas cuando subas las tuyas.
-
-En el mismo archivo, en `SITE`, puedes cambiar el nombre, el texto de «Sobre mí», los enlaces a Instagram y Unsplash, el correo de contacto y la foto de retrato (`portrait: "img/retrato.jpg"`).
-
-## Cursos
-
-Los cursos viven en `window.COURSES`, en `js/photos.js` (id, título, formato, duración, nivel, lugar, próxima fecha, precio, plazas, resumen y lista «You will learn»). Aparecen en la portada (sección Courses), en la página `#/courses` y como opción «Book a course» del formulario de contacto. Los tres que hay ahora son inventados: cámbialos o borra el array para ocultar la sección.
-
-## Tamaños de copia
-
-En el formulario de contacto, al elegir «Buy a print» aparecen dos desplegables: la fotografía y el tamaño. Los tamaños por defecto están en `SITE.printSizes` (en `js/photos.js`) como ancho × alto para fotos horizontales; en las verticales se invierten solos. Si una foto tiene tamaños propios, añádele `sizes: ["40 × 40 cm", "70 × 70 cm"]` en su entrada y se usarán esos.
-
-## Formulario de contacto
-
-GitHub Pages no tiene servidor, así que el formulario funciona de dos maneras:
-
-- **Sin configurar nada:** al enviar se abre la aplicación de correo del visitante con el mensaje preparado hacia el email de `SITE.email`.
-- **Recomendado:** crea un formulario gratuito en [Formspree](https://formspree.io), copia su ID (algo como `xpzgkbqw`) y ponlo en `SITE.formspreeId`. A partir de ahí los mensajes te llegan al correo sin que el visitante salga de la web.
+Los tamaños de copia por defecto están en Settings → Default print sizes (ancho × alto para fotos horizontales; en las verticales se invierten solos). Cada foto puede tener los suyos en su campo «Print sizes».
 
 ## Mapa
 
@@ -69,15 +78,16 @@ Usa [Leaflet](https://leafletjs.com) con teselas de CARTO/OpenStreetMap, sin cla
 
 ## Publicación
 
-- La rama `main` es el código fuente.
-- Cada push a `main` ejecuta el workflow `.github/workflows/deploy.yml`, que copia la web a la rama `gh-pages`.
-- GitHub Pages sirve la rama `gh-pages`. Si alguna vez no aparece activado: **Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: gh-pages / (root)**.
+- `main` es la web pública; `staging` es la web de pruebas. Ambas se publican en la rama `gh-pages` con el workflow `.github/workflows/deploy.yml` (main en la raíz, staging en `/staging/`).
+- El workflow **Publicar staging en la web** fusiona `staging` en `main` y regenera la web pública.
+- Si alguna vez Pages no aparece activado: **Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: gh-pages / (root)**.
 
 ## Probar en local
 
-No hace falta instalar nada. Desde la carpeta del proyecto:
+Desde la carpeta del proyecto:
 
 ```sh
+python3 scripts/build_data.py
 python3 -m http.server 8080
 ```
 

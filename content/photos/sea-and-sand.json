@@ -1,0 +1,24 @@
+{
+  "title": "Sea and Sand",
+  "category": "drone",
+  "src": "img/fotos/sea-and-sand.jpg",
+  "description": "The shoreline in portrait: green water melting into pale sand.",
+  "date": "2021-08-08",
+  "location": {
+    "name": "",
+    "lat": null,
+    "lng": null
+  },
+  "exif": {
+    "camera": "DJI FC220",
+    "lens": "",
+    "focal": "4.7 mm",
+    "aperture": "f/2.2",
+    "shutter": "1/550 s",
+    "iso": "100"
+  },
+  "featured": false,
+  "forSale": true,
+  "unsplashId": "AmYBsuRoEsA",
+  "order": 15
+}

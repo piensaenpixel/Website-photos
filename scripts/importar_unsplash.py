@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """
 Importa las fotografías de un usuario de Unsplash al sitio:
-descarga las imágenes a img/fotos/ y regenera el bloque PHOTOS de js/photos.js
-(título, descripción, datos EXIF, localización y serie estimada).
+descarga las imágenes a img/fotos/ y crea una ficha JSON por foto en
+content/photos/ (título, descripción, datos EXIF, localización y serie
+estimada). Las fotos ya existentes y las listadas en
+content/excluded-unsplash.json se ignoran.
 
 Variables de entorno:
   UNSPLASH_ACCESS_KEY  clave de acceso de la aplicación de Unsplash (obligatoria)
@@ -18,7 +20,9 @@ MAX = int(os.environ.get("MAX_PHOTOS", "40") or 40)
 WIDTH = int(os.environ.get("IMG_WIDTH", "1800") or 1800)
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IMG_DIR = os.path.join(ROOT, "img", "fotos")
-PHOTOS_JS = os.path.join(ROOT, "js", "photos.js")
+CONTENT = os.path.join(ROOT, "content")
+PHOTOS_DIR = os.path.join(CONTENT, "photos")
+EXCLUDED_FILE = os.path.join(CONTENT, "excluded-unsplash.json")
 API = "https://api.unsplash.com"
 
 if not KEY:
@@ -27,17 +31,20 @@ if not KEY:
 remaining = [None]
 
 def read_existing():
-    """Devuelve (entradas actuales, ids de Unsplash excluidos) leyendo js/photos.js con node."""
-    import subprocess
-    code = ("const fs=require('fs');eval(fs.readFileSync(process.argv[1],'utf8').replace(/window\\./g,'globalThis.'));"
-            "console.log(JSON.stringify({photos: globalThis.PHOTOS||[], excluded: globalThis.EXCLUDED_UNSPLASH||[]}))")
-    try:
-        out = subprocess.check_output(["node", "-e", code, PHOTOS_JS], timeout=30).decode("utf-8")
-        d = json.loads(out)
-        return d["photos"], set(d["excluded"])
-    except Exception as e:
-        print("Aviso: no se ha podido leer js/photos.js con node (%s); se parte de cero." % e)
-        return [], set()
+    """Devuelve (fichas actuales, ids de Unsplash excluidos) leyendo content/."""
+    items = []
+    if os.path.isdir(PHOTOS_DIR):
+        for fn in sorted(os.listdir(PHOTOS_DIR)):
+            if fn.endswith(".json"):
+                with open(os.path.join(PHOTOS_DIR, fn), encoding="utf-8") as f:
+                    item = json.load(f)
+                item["id"] = fn[:-5]
+                items.append(item)
+    excluded = set()
+    if os.path.exists(EXCLUDED_FILE):
+        with open(EXCLUDED_FILE, encoding="utf-8") as f:
+            excluded = set(json.load(f))
+    return items, excluded
 
 existing, excluded = read_existing()
 known = {e.get("unsplashId") for e in existing if e.get("unsplashId")}
@@ -186,9 +193,10 @@ for i, p in enumerate(detailed):
     loc_name = clean(loc.get("name")) or clean(", ".join(x for x in [loc.get("city"), loc.get("country")] if x))
     entries.append({
         "id": slug, "title": title, "category": categorize(p), "src": "img/fotos/" + fname,
-        "w": w, "h": h, "description": description_for(p), "date": (p.get("created_at") or "")[:10],
+        "description": description_for(p), "date": (p.get("created_at") or "")[:10],
         "location": {"name": loc_name, "lat": lat, "lng": lng},
         "exif": ex, "featured": False, "forSale": True, "unsplashId": p["id"],
+        "order": len(existing) + i + 1,
     })
     print("%02d %-10s %s" % (i + 1, entries[-1]["category"], title))
 
@@ -202,33 +210,11 @@ for f in os.listdir(IMG_DIR):
     if f.lower().endswith((".jpg", ".jpeg", ".png", ".webp")) and f not in keep:
         os.remove(os.path.join(IMG_DIR, f))
 
-# 5. Regenerar el bloque PHOTOS de js/photos.js
-def entry_js(e):
-    loc = e.get("location") or {"name": "", "lat": None, "lng": None}
-    e = dict(e); e["exif"] = e.get("exif") or {}
-    for k in ("camera", "lens", "focal", "aperture", "shutter", "iso"):
-        e["exif"].setdefault(k, "")
-    lat = "null" if loc.get("lat") is None else repr(float(loc["lat"]))
-    lng = "null" if loc.get("lng") is None else repr(float(loc["lng"]))
-    ex = e["exif"]
-    return (
-        "  {\n"
-        "    id: %s,\n    title: %s,\n    category: %s,\n    src: %s,\n    w: %d, h: %d,\n"
-        "    description: %s,\n    date: %s,\n"
-        "    location: { name: %s, lat: %s, lng: %s },\n"
-        "    exif: { camera: %s, lens: %s, focal: %s, aperture: %s, shutter: %s, iso: %s },\n"
-        "    featured: %s,\n    forSale: %s,\n    unsplashId: %s\n  }"
-    ) % (js_str(e["id"]), js_str(e["title"]), js_str(e["category"]), js_str(e["src"]), e["w"], e["h"],
-         js_str(e.get("description", "")), js_str(e.get("date", "")), js_str(loc.get("name", "")), lat, lng,
-         js_str(ex["camera"]), js_str(ex["lens"]), js_str(ex["focal"]), js_str(ex["aperture"]), js_str(ex["shutter"]), js_str(ex["iso"]),
-         "true" if e.get("featured") else "false", "false" if e.get("forSale") is False else "true", js_str(e.get("unsplashId", "")))
-
-block = ("/* PHOTOS:START — the «Import photos from Unsplash» workflow adds new photos here and keeps edited ones */\n"
-         "window.PHOTOS = [\n" + ",\n".join(entry_js(e) for e in all_entries) + "\n];\n/* PHOTOS:END */\n")
-src = open(PHOTOS_JS, encoding="utf-8").read()
-m = re.search(r"/\* PHOTOS:START.*?/\* PHOTOS:END \*/\n?", src, re.S)
-if not m:
-    sys.exit("No se encuentran los marcadores PHOTOS:START / PHOTOS:END en js/photos.js")
-open(PHOTOS_JS, "w", encoding="utf-8").write(src[:m.start()] + block + src[m.end():])
+# 5. Escribir una ficha JSON por foto nueva
+os.makedirs(PHOTOS_DIR, exist_ok=True)
+for e in entries:
+    e = dict(e); pid = e.pop("id")
+    with open(os.path.join(PHOTOS_DIR, pid + ".json"), "w", encoding="utf-8") as f:
+        json.dump(e, f, ensure_ascii=False, indent=2); f.write("\n")
 print("Añadidas %d fotos nuevas (total %d). Series de las nuevas: %s" % (len(entries), len(all_entries), {c: sum(1 for e in entries if e["category"] == c) for c in ("landscape", "moon", "drone", "night")}))
-print("Revisa js/photos.js: las fotos nuevas llegan con título y descripción automáticos en inglés y serie estimada.")
+print("Revísalas en el panel de administración: llegan con título y descripción automáticos en inglés y serie estimada.")

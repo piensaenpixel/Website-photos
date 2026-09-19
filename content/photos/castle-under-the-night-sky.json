@@ -1,0 +1,24 @@
+{
+  "title": "Castle Under the Night Sky",
+  "category": "night",
+  "src": "img/fotos/castle-under-the-night-sky.jpg",
+  "description": "The silhouette of a ruined castle against the night sky.",
+  "date": "2021-07-11",
+  "location": {
+    "name": "",
+    "lat": null,
+    "lng": null
+  },
+  "exif": {
+    "camera": "NIKON CORPORATION NIKON D5600",
+    "lens": "",
+    "focal": "16 mm",
+    "aperture": "f/2.8",
+    "shutter": "20 s",
+    "iso": "1600"
+  },
+  "featured": true,
+  "forSale": true,
+  "unsplashId": "crYpM4H2lmI",
+  "order": 7
+}

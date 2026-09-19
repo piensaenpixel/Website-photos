@@ -1,0 +1,23 @@
+{
+  "name": "piensaenpixel",
+  "tagline": "Landscape, moon, drone and night photography, from Madrid",
+  "author": "Emilio García",
+  "location": "Spain, Madrid",
+  "email": "piensaenpixel@gmail.com",
+  "formspreeId": "",
+  "printSizes": [
+    "30 × 20 cm",
+    "45 × 30 cm",
+    "60 × 40 cm",
+    "90 × 60 cm",
+    "120 × 80 cm"
+  ],
+  "instagram": "https://www.instagram.com/piensaenpixel/",
+  "unsplash": "https://unsplash.com/@piensaenpixel",
+  "portrait": "",
+  "about": [
+    "I photograph what happens when the light goes: the last hour in the mountains, the moon rising behind a ridge, the Milky Way over a quiet sea.",
+    "I am Emilio García, a photographer based in Madrid. I work handheld, with a drone and with long telephoto lenses, almost always in Spain, looking for places I know well and going back until the light plays along.",
+    "Every photograph on this site is available as a limited-edition print on fine art paper. If you are interested in one, write to me and I will tell you about sizes, finishes and prices."
+  ]
+}

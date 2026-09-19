@@ -1,0 +1,24 @@
+{
+  "title": "Bridge over Crystal-Clear Water",
+  "category": "drone",
+  "src": "img/fotos/bridge-over-crystal-clear-water.jpg",
+  "description": "A bridge crosses water so clear that the bottom shows from the air.",
+  "date": "2025-06-25",
+  "location": {
+    "name": "",
+    "lat": null,
+    "lng": null
+  },
+  "exif": {
+    "camera": "Hasselblad L1D-20c",
+    "lens": "",
+    "focal": "10.3 mm",
+    "aperture": "f/5.6",
+    "shutter": "1/500 s",
+    "iso": "100"
+  },
+  "featured": false,
+  "forSale": true,
+  "unsplashId": "W51Rp00XOdM",
+  "order": 13
+}

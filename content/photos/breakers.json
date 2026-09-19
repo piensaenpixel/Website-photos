@@ -1,0 +1,24 @@
+{
+  "title": "Breakers",
+  "category": "drone",
+  "src": "img/fotos/breakers.jpg",
+  "description": "Waves breaking against the coast, seen straight down from the drone.",
+  "date": "2024-05-13",
+  "location": {
+    "name": "",
+    "lat": null,
+    "lng": null
+  },
+  "exif": {
+    "camera": "Hasselblad L1D-20c",
+    "lens": "",
+    "focal": "10.3 mm",
+    "aperture": "f/4.0",
+    "shutter": "1/80 s",
+    "iso": "100"
+  },
+  "featured": false,
+  "forSale": true,
+  "unsplashId": "qEfcXtAoMt8",
+  "order": 17
+}

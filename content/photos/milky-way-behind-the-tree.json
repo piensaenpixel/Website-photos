@@ -1,0 +1,24 @@
+{
+  "title": "Milky Way Behind the Tree",
+  "category": "night",
+  "src": "img/fotos/milky-way-behind-the-tree.jpg",
+  "description": "The galactic core rises behind a lone tree in the middle of the fields.",
+  "date": "2022-09-26",
+  "location": {
+    "name": "",
+    "lat": null,
+    "lng": null
+  },
+  "exif": {
+    "camera": "",
+    "lens": "",
+    "focal": "",
+    "aperture": "",
+    "shutter": "",
+    "iso": ""
+  },
+  "featured": false,
+  "forSale": true,
+  "unsplashId": "PRrkpoDu_Jo",
+  "order": 16
+}

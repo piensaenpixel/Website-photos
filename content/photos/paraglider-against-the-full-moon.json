@@ -1,0 +1,24 @@
+{
+  "title": "Paraglider Against the Full Moon",
+  "category": "moon",
+  "src": "img/fotos/paraglider-against-the-full-moon.jpg",
+  "description": "A paraglider crosses in front of the full moon between high clouds. Shot with a 600 mm telephoto.",
+  "date": "2024-06-23",
+  "location": {
+    "name": "",
+    "lat": null,
+    "lng": null
+  },
+  "exif": {
+    "camera": "NIKON CORPORATION NIKON Z 7",
+    "lens": "",
+    "focal": "600 mm",
+    "aperture": "f/11.0",
+    "shutter": "1/250 s",
+    "iso": "400"
+  },
+  "featured": true,
+  "forSale": true,
+  "unsplashId": "088Q30AH28w",
+  "order": 1
+}

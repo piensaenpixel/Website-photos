@@ -1,0 +1,24 @@
+{
+  "title": "Island in the Reservoir",
+  "category": "drone",
+  "src": "img/fotos/island-in-the-reservoir.jpg",
+  "description": "A small island surrounded by deep blue water, seen from overhead.",
+  "date": "2019-04-21",
+  "location": {
+    "name": "Valmayor Reservoir, Madrid, Spain",
+    "lat": 40.59125336,
+    "lng": -4.04983783
+  },
+  "exif": {
+    "camera": "DJI FC220",
+    "lens": "",
+    "focal": "4.7 mm",
+    "aperture": "f/2.2",
+    "shutter": "1/50 s",
+    "iso": "101"
+  },
+  "featured": false,
+  "forSale": true,
+  "unsplashId": "DrpCTbaUmfs",
+  "order": 24
+}

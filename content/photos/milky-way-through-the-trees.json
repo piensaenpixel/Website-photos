@@ -1,0 +1,24 @@
+{
+  "title": "Milky Way Through the Trees",
+  "category": "night",
+  "src": "img/fotos/milky-way-through-the-trees.jpg",
+  "description": "The Milky Way finds its way between the treetops on a moonless night.",
+  "date": "2020-08-24",
+  "location": {
+    "name": "",
+    "lat": null,
+    "lng": null
+  },
+  "exif": {
+    "camera": "NIKON CORPORATION NIKON D5600",
+    "lens": "",
+    "focal": "11.5 mm",
+    "aperture": "f/2.8",
+    "shutter": "30 s",
+    "iso": "1000"
+  },
+  "featured": false,
+  "forSale": true,
+  "unsplashId": "UGNXT7QryGA",
+  "order": 14
+}
