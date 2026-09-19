@@ -11,7 +11,7 @@ Portfolio fotográfico estático (HTML, CSS y JavaScript sin dependencias ni bui
 - Portada: foto a pantalla completa con texto en negrita, fila «Social / Localización» con reloj en directo, Sobre mí (S01), Series (S02), Selección de fotos grandes (S03) y Contacto (S04).
 - Cuatro series: **Paisaje**, **Luna**, **Drone** y **Nocturnas**, con galería filtrable en vista grande (una debajo de otra) o rejilla.
 - Página por fotografía con título grande, ficha etiqueta/valor (serie, lugar, fecha, cámara, objetivo, focal, apertura, velocidad, ISO), enlace «Copia: quiero esta foto» al formulario, imagen a todo el ancho, descripción, mapa y navegación anterior/siguiente.
-- Animaciones: pantalla de carga (una vez por visita), cortina negra entre páginas con el título del destino, títulos que entran palabra a palabra, fotos que se descubren al hacer scroll, parallax en las listas y cursor personalizado con «Ver». Todo se desactiva con «reducir movimiento».
+- Animaciones: pantalla de carga (una vez por visita), fundido suave entre páginas, títulos que entran palabra a palabra, fotos que se descubren al hacer scroll, parallax en las listas y cursor personalizado con «Ver». Todo se desactiva con «reducir movimiento».
 - Toda la interfaz está en inglés. Navegación por hash (`#/gallery/moon`, `#/photo/id`...), así que funciona en GitHub Pages sin configuración extra.
 
 ## Importar fotos desde Unsplash

@@ -16,8 +16,6 @@
   const menu = document.getElementById("menu");
   const menuBtn = document.getElementById("menu-btn");
   const loader = document.getElementById("loader");
-  const curtain = document.getElementById("curtain");
-  const curtainLabel = document.getElementById("curtain-label");
   const cursor = document.getElementById("cursor");
   const cursorLabel = document.getElementById("cursor-label");
   const themeBtn = document.getElementById("theme-btn");
@@ -424,27 +422,15 @@
       swap();
       runLoader(startReveals);
     } else {
-      curtainLabel.textContent = curtainLabelFor(seg, arg);
-      curtain.classList.remove("is-out");
-      curtain.classList.add("is-in");
+      app.classList.add("is-leaving");
       setTimeout(() => {
+        app.classList.remove("is-leaving");
         swap();
-        curtain.classList.remove("is-in");
-        curtain.classList.add("is-out");
-        setTimeout(startReveals, 250);
-        setTimeout(() => curtain.classList.remove("is-out"), 700);
-      }, 520);
+        app.classList.add("is-entering");
+        startReveals();
+        setTimeout(() => app.classList.remove("is-entering"), 600);
+      }, 230);
     }
-  }
-
-  function curtainLabelFor(seg, arg) {
-    if (!seg) return SITE.name || "";
-    if (seg === "gallery") return arg ? catName(arg) : "Gallery";
-    if (seg === "photo") { const p = photoById(arg); return p ? p.title : ""; }
-    if (seg === "about") return "About";
-    if (seg === "courses") return "Courses";
-    if (seg === "contact") return "Let's talk";
-    return "404";
   }
 
   function afterRender(seg) {
@@ -459,7 +445,7 @@
     if (seg === "courses") {
       const c = parseHash().params.get("c");
       const el = c && document.getElementById("course-" + c);
-      if (el) setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 900);
+      if (el) setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 700);
     }
     if (seg === "photo") initMap();
     if (seg === "contact") initForm();
