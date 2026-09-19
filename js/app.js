@@ -159,7 +159,7 @@
         (list.length
           ? '<div class="' + (view === "grid" ? "grid" : "works") + '" id="gallery">' + list.map((p, i) => work(p, i % 3, i > 1)).join("") + "</div>"
           : '<p class="empty">No photographs in this series yet.</p>') +
-        '<div style="height: 80px"></div>' +
+        '<div class="row sr" style="padding: 18px 0 80px"><a class="link" data-back href="#/">← Back</a><span>' + (c ? "S" + pad(catIndex(c.id) + 1) : "Archive") + "</span></div>" +
       "</section>"
     );
   }
@@ -219,7 +219,7 @@
         (siblings.length > 1
           ? '<nav class="photo__nav sr"><a class="link" id="nav-prev" href="#/photo/' + esc(prev.id) + '">← ' + esc(prev.title) + '</a><a class="link" id="nav-next" href="#/photo/' + esc(next.id) + '">' + esc(next.title) + " →</a></nav>"
           : '<div class="photo__nav sr"></div>') +
-        '<div class="row sr" style="padding: 18px 0 80px"><a class="link" href="#/gallery/' + esc(p.category) + '">Back to ' + esc(catName(p.category)) + "</a><span>" + pad(idx + 1) + " / " + pad(siblings.length) + "</span></div>" +
+        '<div class="row sr" style="padding: 18px 0 80px"><a class="link" data-back href="#/gallery/' + esc(p.category) + '">Back to ' + esc(catName(p.category)) + "</a><span>" + pad(idx + 1) + " / " + pad(siblings.length) + "</span></div>" +
       "</section>"
     );
   }
@@ -327,6 +327,9 @@
   }
 
   let currentKey = null;
+  const positions = {};   // posición de scroll por página
+  const stack = [];       // páginas visitadas, para saber si estamos volviendo
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
   function render() {
     const { parts, params } = parseHash();
@@ -342,15 +345,28 @@
 
     if (key === currentKey) return;
     const first = currentKey === null;
+    if (currentKey !== null) positions[currentKey] = window.scrollY;
+
+    // ¿Volvemos a la página anterior? Entonces restauramos su posición.
+    const goingBack = stack.length >= 2 && stack[stack.length - 2] === key;
+    if (goingBack) stack.pop(); else stack.push(key);
+    const restoreY = goingBack ? (positions[key] || 0) : 0;
+
     currentKey = key;
     document.title = title;
     closeMenu();
 
     const swap = () => {
       app.innerHTML = html;
-      window.scrollTo({ top: 0, behavior: "instant" });
       cursor.classList.remove("is-link", "is-view");
       afterRender(seg);
+      window.scrollTo({ top: restoreY, behavior: "instant" });
+      if (restoreY > 0) {
+        // Lo que queda por encima ya se vio: no lo volvemos a animar
+        app.querySelectorAll(".sr, .split").forEach((el) => {
+          if (el.getBoundingClientRect().bottom < 0) el.classList.add("is-in");
+        });
+      }
     };
 
     if (first) {
@@ -641,6 +657,15 @@
     if (e.key === "Escape") closeMenu();
     if (e.key === "ArrowLeft") { const a = document.getElementById("nav-prev"); if (a) location.hash = a.getAttribute("href"); }
     if (e.key === "ArrowRight") { const a = document.getElementById("nav-next"); if (a) location.hash = a.getAttribute("href"); }
+  });
+
+  // Enlaces con data-back: si la página anterior es el destino, volvemos por
+  // el historial (y así se restaura la posición); si no, navegamos normal.
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("a[data-back]");
+    if (!a) return;
+    const target = a.getAttribute("href").replace(/^#/, "").split("/").filter(Boolean).join("/");
+    if (stack.length >= 2 && stack[stack.length - 2] === target) { e.preventDefault(); history.back(); }
   });
 
   window.addEventListener("hashchange", render);
