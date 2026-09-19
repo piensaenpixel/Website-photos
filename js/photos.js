@@ -51,6 +51,53 @@ window.CATEGORIES = [
   { id: "night", name: "Night", intro: "Long exposures under dark skies: Milky Way, star trails and distant lights." }
 ]
 
+/* =====================================================================
+   CURSOS
+   Cada curso: id (para la URL), title, format, duration, level, where,
+   next (próxima fecha), price, group (plazas), summary y learn (lista).
+   ===================================================================== */
+window.COURSES = [
+  {
+    id: "night-sky-workshop",
+    title: "Night Sky & Milky Way Workshop",
+    format: "In the field, one night",
+    duration: "6 hours (sunset to 2 am)",
+    level: "Beginner to intermediate",
+    where: "Sierra de Guadarrama, Madrid",
+    next: "Next new moon, dates on request",
+    price: "180 € per person",
+    group: "Max. 6 people",
+    summary: "One full night under a dark sky learning to plan, focus and expose the Milky Way, then bring the frame home with a clean foreground. Bring a camera with manual mode, a wide lens and a tripod; I bring the coffee.",
+    learn: ["Planning with PhotoPills and weather apps", "Focusing and exposing in the dark", "Foreground light painting and blending", "Basic stacking to kill the noise"]
+  },
+  {
+    id: "drone-photography-day",
+    title: "Drone Photography from Scratch",
+    format: "In the field, one day",
+    duration: "8 hours",
+    level: "Beginner",
+    where: "Tarifa coast, Cádiz, or the Madrid reservoirs",
+    next: "Spring and autumn, small groups",
+    price: "220 € per person",
+    group: "Max. 4 people",
+    summary: "Everything you need to fly legally and come back with photographs instead of screenshots: rules and registration, safe flying, and how to see the landscape from above. Drones available if you do not have one yet.",
+    learn: ["Regulations, registration and no-fly zones", "Top-down and low-angle composition", "Exposure, ND filters and RAW on a drone", "Panoramas and bracketing from the air"]
+  },
+  {
+    id: "landscape-editing-online",
+    title: "Editing for Landscape, Moon and Night",
+    format: "Online, live sessions",
+    duration: "4 sessions of 2 hours",
+    level: "All levels",
+    where: "Online, recordings included",
+    next: "One edition per quarter",
+    price: "120 € per person",
+    group: "Max. 10 people",
+    summary: "My complete workflow in Lightroom and Photoshop, from a flat RAW to a print-ready file: colour, contrast, moon and night processing, stacking and preparing files for fine art printing.",
+    learn: ["Lightroom workflow for landscape", "Processing the moon and the Milky Way", "Stacking and blending exposures", "Preparing files for print"]
+  }
+];
+
 /* PHOTOS:START — the «Import photos from Unsplash» workflow adds new photos here and keeps edited ones */
 window.PHOTOS = [
   {

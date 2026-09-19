@@ -48,6 +48,10 @@ El workflow **Importar fotos de Unsplash** (pestaña Actions → Run workflow) d
 
 En el mismo archivo, en `SITE`, puedes cambiar el nombre, el texto de «Sobre mí», los enlaces a Instagram y Unsplash, el correo de contacto y la foto de retrato (`portrait: "img/retrato.jpg"`).
 
+## Cursos
+
+Los cursos viven en `window.COURSES`, en `js/photos.js` (id, título, formato, duración, nivel, lugar, próxima fecha, precio, plazas, resumen y lista «You will learn»). Aparecen en la portada (sección Courses), en la página `#/courses` y como opción «Book a course» del formulario de contacto. Los tres que hay ahora son inventados: cámbialos o borra el array para ocultar la sección.
+
 ## Tamaños de copia
 
 En el formulario de contacto, al elegir «Buy a print» aparecen dos desplegables: la fotografía y el tamaño. Los tamaños por defecto están en `SITE.printSizes` (en `js/photos.js`) como ancho × alto para fotos horizontales; en las verticales se invierten solos. Si una foto tiene tamaños propios, añádele `sizes: ["40 × 40 cm", "70 × 70 cm"]` en su entrada y se usarán esos.

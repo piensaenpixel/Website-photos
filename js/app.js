@@ -9,6 +9,8 @@
   const SITE = window.SITE || {};
   const PHOTOS = window.PHOTOS || [];
   const CATEGORIES = window.CATEGORIES || [];
+  const COURSES = window.COURSES || [];
+  const courseById = (id) => COURSES.find((c) => c.id === id);
 
   const app = document.getElementById("app");
   const menu = document.getElementById("menu");
@@ -115,7 +117,15 @@
         '<div class="row sr" style="padding-top: 18px"><span>Archive:</span><a class="link" href="#/gallery">See the full gallery</a></div></div>' +
       "</section>" +
 
-      '<section class="section" style="padding-bottom: 80px">' + sectionHead("Contact", 4) +
+      (COURSES.length
+        ? '<section class="section">' + sectionHead("Courses", 4) +
+            '<div class="section__body"><div class="series">' +
+              COURSES.map((c, i) => '<a class="sr" style="--i:' + i + '" href="#/courses?c=' + esc(c.id) + '"><span>' + pad(i + 1) + '</span><span class="t-section">' + esc(c.title) + "</span><span>" + esc(c.price) + "</span></a>").join("") +
+            "</div>" +
+            '<div class="row sr" style="padding-top: 18px"><span>Details:</span><a class="link" href="#/courses">See all courses</a></div></div>' +
+          "</section>"
+        : "") +
+      '<section class="section" style="padding-bottom: 80px">' + sectionHead("Contact", COURSES.length ? 5 : 4) +
         '<div class="section__body sr">' +
           metaList([
             ["Email", SITE.email ? '<a href="mailto:' + esc(SITE.email) + '">' + esc(SITE.email) + "</a>" : ""],
@@ -262,14 +272,18 @@
 
   function renderContact(params) {
     const p = params.get("photo") ? photoById(params.get("photo")) : null;
-    const subject = p ? "I am interested in the photograph “" + p.title + "”" : "";
+    const course = params.get("course") ? courseById(params.get("course")) : null;
+    const wantsCourse = !!course || params.get("subject") === "course";
+    const subject = p ? "I am interested in the photograph “" + p.title + "”" : (course ? "I would like to book the course “" + course.title + "”" : (wantsCourse ? "I would like to book a course" : ""));
     const options = ['<option value="Buy a print"' + (p ? " selected" : "") + ">Buy a print</option>",
+      (COURSES.length ? '<option value="Book a course"' + (wantsCourse ? " selected" : "") + ">Book a course</option>" : ""),
       '<option value="Licensing">Licensing</option>',
       '<option value="Commission">Commission or collaboration</option>',
       '<option value="Something else">Something else</option>'].join("");
     const photoOptions = '<option value="">Choose a photograph</option>' + PHOTOS.filter((x) => x.forSale !== false).map((x) =>
       '<option value="' + esc(x.title) + '" data-id="' + esc(x.id) + '"' + (p && x.id === p.id ? " selected" : "") + ">" + esc(x.title) + (x.location && x.location.name ? " — " + esc(x.location.name) : "") + "</option>").join("");
     const sizeOptions = '<option value="">Choose a size</option>' + sizesFor(p).map((sz) => '<option value="' + esc(sz) + '">' + esc(sz) + "</option>").join("");
+    const courseOptions = '<option value="">Choose a course</option>' + COURSES.map((c) => '<option value="' + esc(c.title) + '"' + (course && c.id === course.id ? " selected" : "") + ">" + esc(c.title) + " — " + esc(c.format) + "</option>").join("");
 
     return (
       '<section class="page">' +
@@ -295,6 +309,7 @@
             '<div class="field"><label for="f-photo">Photograph:</label><select id="f-photo" name="photograph">' + photoOptions + "</select></div>" +
             '<div class="field" id="f-size-wrap"><label for="f-size">Size:</label><select id="f-size" name="size">' + sizeOptions + "</select></div>" +
           "</div>" +
+          '<div class="field" id="f-course-wrap" hidden><label for="f-course">Course:</label><select id="f-course" name="course">' + courseOptions + "</select></div>" +
           '<div class="field"><label for="f-msg">Message:</label><textarea id="f-msg" name="message" placeholder="Tell me what you have in mind" required>' + esc(subject ? subject + ".\n\n" : "") + "</textarea></div>" +
           '<input type="hidden" name="_subject" value="' + esc(subject || "Message from the website") + '">' +
           '<label class="hp" aria-hidden="true">Leave empty<input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label>' +
@@ -305,6 +320,41 @@
           '<p class="form__status" id="form-status" aria-live="polite"></p>' +
         "</form>" +
         '<div style="height: 80px"></div>' +
+      "</section>"
+    );
+  }
+
+  /* ------------------------------------------------------------- cursos */
+  function renderCourses(params) {
+    const focus = params.get("c");
+    return (
+      '<section class="page">' +
+        '<h1 class="t-display split" data-split>Courses</h1>' +
+        '<div class="page__meta sr">' +
+          metaList([
+            ["Formats", "In the field and online"],
+            ["Groups", "Small, from 4 to 10 people"],
+            ["Booking", '<a href="#/contact?subject=course">Write to me</a>'],
+            ["Gift", "All courses can be gifted with a voucher"]
+          ]) +
+        "</div>" +
+        COURSES.map((c, i) =>
+          '<section class="section" id="course-' + esc(c.id) + '" style="padding: 0; margin-top: clamp(48px, 8vh, 96px)">' +
+            '<div class="section__head sr"><h2 class="t-section">' + esc(c.title) + '</h2><span class="t-section">C' + pad(i + 1) + "</span></div>" +
+            '<div class="section__body">' +
+              '<div class="sr">' + metaList([
+                ["Format", esc(c.format)], ["Duration", esc(c.duration)], ["Level", esc(c.level)],
+                ["Where", esc(c.where)], ["Next", esc(c.next)], ["Group", esc(c.group)], ["Price", esc(c.price)]
+              ]) + "</div>" +
+              '<p class="copy t-muted sr" style="margin-top: 24px">' + esc(c.summary) + "</p>" +
+              ((c.learn || []).length
+                ? '<dl class="meta sr" style="margin-top: 24px">' + (c.learn || []).map((l, k) => "<dt>" + (k === 0 ? "You will learn:" : "") + "</dt><dd>" + esc(l) + "</dd>").join("") + "</dl>"
+                : "") +
+              '<div class="row sr" style="padding-top: 24px"><span>Book:</span><a class="link" href="#/contact?course=' + encodeURIComponent(c.id) + '">Ask for dates</a></div>' +
+            "</div>" +
+          "</section>"
+        ).join("") +
+        '<div class="row sr" style="padding: 48px 0 80px"><a class="link" data-back href="#/">← Back</a><span>' + COURSES.length + (COURSES.length === 1 ? " course" : " courses") + "</span></div>" +
       "</section>"
     );
   }
@@ -340,6 +390,7 @@
     else if (seg === "gallery") { html = renderGallery(arg); title = (arg ? catName(arg) : "Gallery") + " — " + SITE.name; }
     else if (seg === "photo") { const p = photoById(arg); html = renderPhoto(arg); if (p) title = p.title + " — " + SITE.name; }
     else if (seg === "about") { html = renderAbout(); title = "About — " + SITE.name; }
+    else if (seg === "courses") { html = renderCourses(params); title = "Courses — " + SITE.name; key += "?" + params.toString(); }
     else if (seg === "contact") { html = renderContact(params); title = "Contact — " + SITE.name; key += "?" + params.toString(); }
     else { html = renderNotFound(); }
 
@@ -391,6 +442,7 @@
     if (seg === "gallery") return arg ? catName(arg) : "Gallery";
     if (seg === "photo") { const p = photoById(arg); return p ? p.title : ""; }
     if (seg === "about") return "About";
+    if (seg === "courses") return "Courses";
     if (seg === "contact") return "Let's talk";
     return "404";
   }
@@ -404,6 +456,11 @@
     app.querySelectorAll("[data-split]").forEach(splitWords);
     initParallax();
     if (seg === "gallery") initViewToggle();
+    if (seg === "courses") {
+      const c = parseHash().params.get("c");
+      const el = c && document.getElementById("course-" + c);
+      if (el) setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 900);
+    }
     if (seg === "photo") initMap();
     if (seg === "contact") initForm();
   }
@@ -563,13 +620,17 @@
       const ph = opt && opt.dataset.id ? photoById(opt.dataset.id) : null;
       sizeSel.innerHTML = '<option value="">Choose a size</option>' + sizesFor(ph).map((sz) => '<option value="' + esc(sz) + '">' + esc(sz) + "</option>").join("");
     };
+    const courseWrap = document.getElementById("f-course-wrap");
+    const courseSel = document.getElementById("f-course");
     const syncTopic = () => {
       const buy = topic.value === "Buy a print";
       const showPhoto = buy || topic.value === "Licensing";
+      const isCourse = topic.value === "Book a course";
       printRow.hidden = !showPhoto;
       sizeWrap.hidden = !buy;
       photoSel.disabled = !showPhoto;
       sizeSel.disabled = !buy;
+      if (courseWrap) { courseWrap.hidden = !isCourse; courseSel.disabled = !isCourse; }
     };
     topic.addEventListener("change", syncTopic);
     photoSel.addEventListener("change", fillSizes);
@@ -585,6 +646,11 @@
       }
       if (topic.value === "Buy a print" && (!photoSel.value || !sizeSel.value)) {
         status.textContent = "Please choose the photograph and the size you would like.";
+        status.classList.add("is-error");
+        return;
+      }
+      if (topic.value === "Book a course" && courseSel && !courseSel.value) {
+        status.textContent = "Please choose the course you are interested in.";
         status.classList.add("is-error");
         return;
       }
@@ -607,7 +673,7 @@
       }
       const subject = data.get("_subject") || "Message from the website";
       const body = ["Name: " + data.get("name"), "Email: " + data.get("email"), "Subject: " + data.get("subject"),
-        data.get("photograph") ? "Photograph: " + data.get("photograph") : "", data.get("size") ? "Size: " + data.get("size") : "", "", data.get("message")].filter((l) => l !== "").join("\n");
+        data.get("photograph") ? "Photograph: " + data.get("photograph") : "", data.get("size") ? "Size: " + data.get("size") : "", data.get("course") ? "Course: " + data.get("course") : "", "", data.get("message")].filter((l) => l !== "").join("\n");
       window.location.href = "mailto:" + encodeURIComponent(SITE.email || "") + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
       status.textContent = "Your email app is opening. If nothing happens, write to me at " + (SITE.email || "my email") + ".";
     });
