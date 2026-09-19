@@ -53,7 +53,7 @@ El panel necesita un pequeño servicio de login para GitHub. Es gratuito:
    - `GITHUB_CLIENT_ID` = el Client ID
    - `GITHUB_CLIENT_SECRET` = el Client secret
    - `ALLOWED_DOMAINS` = `piensaenpixel.github.io`
-5. En `admin/config.yml`, sustituye `https://sveltia-cms-auth.REEMPLAZA.workers.dev` por la URL de tu worker (o pásasela a Claude y lo hace).
+5. La URL del worker (`https://sveltia-cms-auth.piensaenpixel.workers.dev`) ya está en `admin/config.yml`.
 
 A partir de ahí, https://piensaenpixel.github.io/Website-photos/admin/ te pedirá entrar con GitHub y ya está.
 

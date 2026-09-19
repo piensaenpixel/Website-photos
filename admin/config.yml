@@ -7,8 +7,7 @@ backend:
   repo: piensaenpixel/Website-photos
   branch: staging
   # URL del servicio de login (sveltia-cms-auth en Cloudflare Workers).
-  # Sustituir por la URL real del worker cuando esté creado.
-  base_url: https://sveltia-cms-auth.REEMPLAZA.workers.dev
+  base_url: https://sveltia-cms-auth.piensaenpixel.workers.dev
 
 site_url: https://piensaenpixel.github.io/Website-photos/staging/
 display_url: https://piensaenpixel.github.io/Website-photos/staging/
