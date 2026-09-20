@@ -112,7 +112,7 @@
 
       '<section class="section">' + sectionHead("Selected", 3) +
         '<div class="section__body"><div class="works">' + featured.slice(0, 8).map((p, i) => work(p, 0, i > 0)).join("") + "</div>" +
-        '<div class="row sr" style="padding-top: 18px"><span>Archive:</span><a class="link" href="#/gallery">See the full gallery</a></div></div>' +
+        '<div class="row row--kv sr" style="padding-top: 18px"><span>Archive:</span><a class="link" href="#/gallery">See the full gallery</a></div></div>' +
       "</section>" +
 
       (COURSES.length
@@ -120,7 +120,7 @@
             '<div class="section__body"><div class="series">' +
               COURSES.map((c, i) => '<a class="sr" style="--i:' + i + '" href="#/courses?c=' + esc(c.id) + '"><span>' + pad(i + 1) + '</span><span class="t-section">' + esc(c.title) + "</span><span>" + esc(c.price) + "</span></a>").join("") +
             "</div>" +
-            '<div class="row sr" style="padding-top: 18px"><span>Details:</span><a class="link" href="#/courses">See all courses</a></div></div>' +
+            '<div class="row row--kv sr" style="padding-top: 18px"><span>Details:</span><a class="link" href="#/courses">See all courses</a></div></div>' +
           "</section>"
         : "") +
       '<section class="section" style="padding-bottom: 80px">' + sectionHead("Contact", COURSES.length ? 5 : 4) +
@@ -220,7 +220,7 @@
         '<div class="copy photo__desc sr">' + paragraphs(p.description) + "</div>" +
         (hasMap
           ? '<div class="map sr" id="mapa">' +
-              '<div class="row" style="margin-bottom: 14px"><span>Location: ' + esc(locName(p)) + "</span><span>" + fmtCoord(p.location.lat, p.location.lng) + "</span></div>" +
+              '<div class="row row--kv" style="margin-bottom: 14px"><span>Location: ' + esc(locName(p)) + "</span><span>" + fmtCoord(p.location.lat, p.location.lng) + "</span></div>" +
               '<div class="map__canvas" id="map-canvas" data-lat="' + p.location.lat + '" data-lng="' + p.location.lng + '" data-name="' + esc(locName(p)) + '"><div class="map__fallback">Loading map…</div></div>' +
             "</div>"
           : "") +
@@ -295,7 +295,7 @@
           ]) +
         "</div>" +
         (p
-          ? '<div class="row sr" style="margin-bottom: 24px"><span>Photograph:</span><a class="link" href="#/photo/' + esc(p.id) + '">' + esc(p.title) + (locName(p) ? " — " + esc(locName(p)) : "") + "</a></div>"
+          ? '<div class="row row--kv sr" style="margin-bottom: 24px"><span>Photograph:</span><a class="link" href="#/photo/' + esc(p.id) + '">' + esc(p.title) + (locName(p) ? " — " + esc(locName(p)) : "") + "</a></div>"
           : "") +
         '<form class="form sr" id="contact-form" novalidate>' +
           '<div class="form__row">' +
@@ -348,7 +348,7 @@
               ((c.learn || []).length
                 ? '<dl class="meta sr" style="margin-top: 24px">' + (c.learn || []).map((l, k) => "<dt>" + (k === 0 ? "You will learn:" : "") + "</dt><dd>" + esc(l) + "</dd>").join("") + "</dl>"
                 : "") +
-              '<div class="row sr" style="padding-top: 24px"><span>Book:</span><a class="link" href="#/contact?course=' + encodeURIComponent(c.id) + '">Ask for dates</a></div>' +
+              '<div class="row row--kv sr" style="padding-top: 24px"><span>Book:</span><a class="link" href="#/contact?course=' + encodeURIComponent(c.id) + '">Ask for dates</a></div>' +
             "</div>" +
           "</section>"
         ).join("") +

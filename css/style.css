@@ -123,6 +123,14 @@ h1, h2, h3, p, dl, dd, dt { margin: 0; }
 /* Fila etiqueta / valor (una línea) */
 .row { display: flex; justify-content: space-between; gap: 24px; }
 
+/* En pantallas grandes el valor va justo después de la etiqueta, no al otro extremo */
+@media (min-width: 901px) {
+  .meta { grid-template-columns: minmax(16ch, max-content) max-content; column-gap: 32px; }
+  .meta dd { text-align: left; }
+  .row--kv { justify-content: flex-start; gap: 32px; }
+  .row--kv > :first-child { min-width: 16ch; }
+}
+
 /* Párrafo grande en mono */
 .copy { max-width: 78ch; line-height: 1.55; }
 .copy p + p { margin-top: 1.4em; }
