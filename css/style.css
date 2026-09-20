@@ -231,6 +231,17 @@ h1, h2, h3, p, dl, dd, dt { margin: 0; }
 .photo__stage img { width: 100%; height: auto; opacity: 0; transition: opacity 1s ease; }
 .photo__stage img.is-loaded { opacity: 1; }
 .photo__stage--portrait { max-width: min(680px, 78%); margin-inline: auto; }
+/* Carrusel foto / montaje en pared */
+.carousel { position: relative; display: grid; background: transparent; }
+.carousel__slide { grid-area: 1 / 1; transition: opacity 0.5s ease; }
+.carousel__slide:not(.is-active) { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+.carousel__slide img { display: block; width: auto; max-width: 100%; height: auto; max-height: 82vh; margin-inline: auto; }
+.carousel__zone { position: absolute; top: 0; bottom: 0; width: 50%; z-index: 2; background: none; border: 0; padding: 0; }
+.carousel__zone--prev { left: 0; cursor: w-resize; }
+.carousel__zone--next { right: 0; cursor: e-resize; }
+.carousel__zone[hidden] { display: none; }
+.carousel__zone:focus-visible { outline: 1px solid var(--ink); outline-offset: -4px; }
+.carousel__meta { padding-top: 12px; color: var(--muted); }
 .photo__desc { margin: 36px 0 0; }
 .photo__nav { display: flex; justify-content: space-between; gap: 24px; padding: 18px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-top: 48px; }
 .map { margin-top: 48px; }

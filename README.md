@@ -66,6 +66,10 @@ El workflow **Importar fotos de Unsplash** (Actions → Run workflow, eligiendo 
 - Las nuevas llegan con título y descripción automáticos en inglés y serie estimada por palabras clave: revísalas en el panel.
 - La clave se pasa como entrada del workflow o, mejor, como secret del repositorio llamado `UNSPLASH_ACCESS_KEY`. Las apps de Unsplash en modo demo permiten 50 peticiones por hora, unas 45 fotos por ejecución.
 
+## Foto en la pared (carrusel)
+
+Cada foto tiene un campo opcional **On the wall** en el panel: una segunda imagen con la copia enmarcada en una habitación. Si está, la página de la foto muestra un carrusel de dos imágenes: pasando el ratón por la mitad derecha aparece «Next» y al pulsar se ve el montaje; en el montaje, la mitad izquierda vuelve con «Previous». En móvil, tocar o deslizar. Los dos montajes que hay ahora son de ejemplo, generados automáticamente.
+
 ## Cursos y tamaños de copia
 
 Los cursos se editan en el panel (colección Courses) y aparecen en la portada, en `#/courses` y como opción «Book a course» del formulario. Si no hay ninguno, la sección desaparece.

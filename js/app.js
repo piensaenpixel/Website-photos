@@ -216,7 +216,15 @@
           ]) +
           (p.forSale !== false ? metaList([["Print", '<a href="#/contact?photo=' + encodeURIComponent(p.id) + '">I want this photo</a>']]) : "") +
         "</div>" +
-        '<div class="sr-img sr"><div class="media photo__stage' + (p.h > p.w ? " photo__stage--portrait" : "") + '">' + img(p, 'fetchpriority="high"') + "</div></div>" +
+        (p.mockup
+          ? '<div class="sr-img sr"><div class="media photo__stage carousel" id="carousel">' +
+              '<div class="carousel__slide is-active" data-label="Photograph">' + img(p, 'fetchpriority="high"') + "</div>" +
+              '<div class="carousel__slide" data-label="On the wall"><img src="' + esc(p.mockup) + '" alt="' + esc(p.title) + ' on a wall" width="' + (p.mockupW || "") + '" height="' + (p.mockupH || "") + '" data-fade></div>' +
+              '<button type="button" class="carousel__zone carousel__zone--prev" data-dir="-1" data-cursor="Previous" aria-label="Previous image" hidden></button>' +
+              '<button type="button" class="carousel__zone carousel__zone--next" data-dir="1" data-cursor="Next" aria-label="Next image"></button>' +
+            "</div>" +
+            '<div class="row carousel__meta"><span id="carousel-label">Photograph</span><span id="carousel-count">01 / 02</span></div></div>'
+          : '<div class="sr-img sr"><div class="media photo__stage' + (p.h > p.w ? " photo__stage--portrait" : "") + '">' + img(p, 'fetchpriority="high"') + "</div></div>") +
         '<div class="copy photo__desc sr">' + paragraphs(p.description) + "</div>" +
         (hasMap
           ? '<div class="map sr" id="mapa">' +
@@ -447,7 +455,7 @@
       const el = c && document.getElementById("course-" + c);
       if (el) setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 700);
     }
-    if (seg === "photo") initMap();
+    if (seg === "photo") { initMap(); initCarousel(); }
     if (seg === "contact") initForm();
   }
 
@@ -547,6 +555,37 @@
     document.addEventListener("mouseleave", () => cursor.classList.add("is-hidden"));
     document.addEventListener("mouseenter", () => cursor.classList.remove("is-hidden"));
   })();
+
+  /* ---------------------------------------------------------- carrusel */
+  function initCarousel() {
+    const el = document.getElementById("carousel");
+    if (!el) return;
+    const slides = Array.from(el.querySelectorAll(".carousel__slide"));
+    const prev = el.querySelector(".carousel__zone--prev");
+    const next = el.querySelector(".carousel__zone--next");
+    const label = document.getElementById("carousel-label");
+    const count = document.getElementById("carousel-count");
+    let i = 0;
+    const show = (n) => {
+      i = Math.max(0, Math.min(slides.length - 1, n));
+      slides.forEach((sl, k) => sl.classList.toggle("is-active", k === i));
+      prev.hidden = i === 0;
+      next.hidden = i === slides.length - 1;
+      if (label) label.textContent = slides[i].dataset.label || "";
+      if (count) count.textContent = pad(i + 1) + " / " + pad(slides.length);
+      cursor.classList.remove("is-view");
+    };
+    el.querySelectorAll(".carousel__zone").forEach((z) => z.addEventListener("click", () => show(i + Number(z.dataset.dir))));
+    // Deslizar en pantallas táctiles
+    let x0 = null;
+    el.addEventListener("touchstart", (e) => { x0 = e.touches[0].clientX; }, { passive: true });
+    el.addEventListener("touchend", (e) => {
+      if (x0 === null) return;
+      const dx = e.changedTouches[0].clientX - x0; x0 = null;
+      if (Math.abs(dx) > 40) show(i + (dx < 0 ? 1 : -1));
+    }, { passive: true });
+    show(0);
+  }
 
   /* -------------------------------------------------------------- mapa */
   const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";

@@ -102,6 +102,13 @@ for p in photos:
     else:
         p.setdefault("w", 3); p.setdefault("h", 2)
         warnings.append("Sin imagen o tamaño desconocido: %s (%s)" % (p["id"], src))
+    if p.get("mockup"):
+        msize = image_size(os.path.join(IMG_ROOT, p["mockup"]))
+        if msize:
+            p["mockupW"], p["mockupH"] = msize
+        else:
+            warnings.append("Montaje no encontrado: %s (%s)" % (p["id"], p["mockup"]))
+            p["mockup"] = ""
     if p.get("category") not in {s["id"] for s in series}:
         warnings.append("La foto %s tiene una serie desconocida: %s" % (p["id"], p.get("category")))
 

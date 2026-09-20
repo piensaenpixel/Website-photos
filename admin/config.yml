@@ -47,6 +47,7 @@ collections:
         display_fields: [name]
         search_fields: [name]
       - { name: src, label: Image, widget: image, hint: "JPG recommended. Large files are resized to 2000 px when publishing." }
+      - { name: mockup, label: On the wall, widget: image, required: false, hint: "Optional second image showing the print in a room. If set, the photo page shows a two-image carousel." }
       - { name: description, label: Description, widget: text, required: false }
       - { name: date, label: Date, widget: datetime, format: YYYY-MM-DD, date_format: DD/MM/YYYY, time_format: false, required: false }
       - name: location
