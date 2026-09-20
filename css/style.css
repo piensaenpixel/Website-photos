@@ -128,15 +128,15 @@ h1, h2, h3, p, dl, dd, dt { margin: 0; }
 /* Ficha en dos columnas (solo en pantallas grandes) */
 .meta-cols { display: grid; gap: 0; }
 @media (min-width: 901px) {
-  .meta-cols { grid-template-columns: repeat(2, max-content); gap: 0 clamp(48px, 8vw, 160px); align-items: start; }
+  .meta-cols { grid-template-columns: repeat(2, max-content); gap: 0 clamp(96px, 14vw, 260px); align-items: start; }
 }
 
 /* En pantallas grandes el valor va justo después de la etiqueta, no al otro extremo */
 @media (min-width: 901px) {
-  .meta { grid-template-columns: minmax(16ch, max-content) max-content; column-gap: 32px; }
+  .meta { grid-template-columns: minmax(13ch, max-content) max-content; column-gap: 20px; }
   .meta dd { text-align: left; }
-  .row--kv { justify-content: flex-start; gap: 32px; }
-  .row--kv > :first-child { min-width: 16ch; }
+  .row--kv { justify-content: flex-start; gap: 20px; }
+  .row--kv > :first-child { min-width: 13ch; }
 }
 
 /* Párrafo grande en mono */
