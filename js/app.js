@@ -204,17 +204,21 @@
         '<h1 class="t-display split" data-split>' + esc(p.title) + "</h1>" +
         (p.description ? '<div class="copy photo__desc sr">' + paragraphs(p.description) + "</div>" : "") +
         '<div class="page__meta sr">' +
-          metaList([
-            ["Series", '<a href="#/gallery/' + esc(p.category) + '">' + esc(catName(p.category)) + "</a>"],
-            ["Place", esc(locName(p))],
-            ["Date", esc(fmtDate(p.date))],
-            ["Camera", esc(ex.camera)],
-            ["Lens", esc(ex.lens)],
-            ["Focal length", esc(ex.focal)],
-            ["Aperture", esc(ex.aperture)],
-            ["Shutter", esc(ex.shutter)],
-            ["ISO", esc(ex.iso)]
-          ]) +
+          '<div class="meta-cols">' +
+            metaList([
+              ["Series", '<a href="#/gallery/' + esc(p.category) + '">' + esc(catName(p.category)) + "</a>"],
+              ["Place", esc(locName(p))],
+              ["Date", esc(fmtDate(p.date))],
+              ["Camera", esc(ex.camera)]
+            ]) +
+            metaList([
+              ["Lens", esc(ex.lens)],
+              ["Focal length", esc(ex.focal)],
+              ["Aperture", esc(ex.aperture)],
+              ["Shutter", esc(ex.shutter)],
+              ["ISO", esc(ex.iso)]
+            ]) +
+          "</div>" +
           (p.forSale !== false ? metaList([["Print", '<a href="#/contact?photo=' + encodeURIComponent(p.id) + '">I want this photo</a>']]) : "") +
         "</div>" +
         (p.mockup
