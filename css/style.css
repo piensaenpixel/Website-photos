@@ -307,14 +307,16 @@ h1, h2, h3, p, dl, dd, dt { margin: 0; }
 .menu {
   position: fixed; inset: 0; z-index: 50;
   background: var(--bg); color: var(--ink);
-  display: flex; flex-direction: column; justify-content: space-between;
+  display: flex; flex-direction: column; justify-content: space-between; gap: 32px;
   padding: calc(var(--gutter) * 1.2) var(--gutter) calc(var(--bar-h) + 16px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .menu[hidden] { display: none; }
 .menu__nav { display: grid; gap: 2px; }
 .menu__nav a {
   font-family: var(--sans); font-weight: 700; text-transform: uppercase; letter-spacing: -0.03em;
-  font-size: clamp(38px, 7.5vw, 96px); line-height: 1;
+  font-size: clamp(38px, min(7.5vw, 8.2vh), 96px); line-height: 1;
   display: flex; align-items: baseline; gap: 18px;
   opacity: 0; transform: translateY(24px);
   animation: menu-in 0.7s var(--ease) forwards;
