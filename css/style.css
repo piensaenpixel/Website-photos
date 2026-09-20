@@ -226,7 +226,7 @@ h1, h2, h3, p, dl, dd, dt { margin: 0; }
 .page { padding: calc(var(--gutter) * 1.2) var(--gutter) 0; }
 .page .t-display { margin-bottom: clamp(60px, 22vh, 260px); }
 /* En la foto, la descripción va bajo el título y el gran espacio queda entre ella y la ficha */
-.page .t-display + .photo__desc { margin-top: calc(clamp(60px, 22vh, 260px) * -1 + 32px); margin-bottom: clamp(60px, 22vh, 260px); }
+.page .t-display + .photo__desc { margin-top: calc(clamp(60px, 22vh, 260px) * -1 + 32px); margin-bottom: 96px; }
 .page .t-display + .meta { margin-top: 0; }
 .page__meta { display: grid; gap: 18px; margin-bottom: 24px; }
 
