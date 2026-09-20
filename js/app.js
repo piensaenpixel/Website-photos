@@ -202,6 +202,7 @@
     return (
       '<section class="page">' +
         '<h1 class="t-display split" data-split>' + esc(p.title) + "</h1>" +
+        (p.description ? '<div class="copy photo__desc sr">' + paragraphs(p.description) + "</div>" : "") +
         '<div class="page__meta sr">' +
           metaList([
             ["Series", '<a href="#/gallery/' + esc(p.category) + '">' + esc(catName(p.category)) + "</a>"],
@@ -224,8 +225,7 @@
               '<button type="button" class="carousel__zone carousel__zone--next" data-dir="1" data-cursor="Next" aria-label="Next image"></button>' +
             "</div>" +
             '<div class="row carousel__meta"><span id="carousel-label">Photograph</span><span id="carousel-count">01 / 02</span></div></div>'
-          : '<div class="sr-img sr"><div class="media photo__stage' + (p.h > p.w ? " photo__stage--portrait" : "") + '">' + img(p, 'fetchpriority="high"') + "</div></div>") +
-        '<div class="copy photo__desc sr">' + paragraphs(p.description) + "</div>" +
+          : '<div class="sr-img sr"><div class="media photo__stage">' + img(p, 'fetchpriority="high"') + "</div></div>") +
         (hasMap
           ? '<div class="map sr" id="mapa">' +
               '<div class="row row--kv" style="margin-bottom: 14px"><span>Location: ' + esc(locName(p)) + "</span><span>" + fmtCoord(p.location.lat, p.location.lng) + "</span></div>" +

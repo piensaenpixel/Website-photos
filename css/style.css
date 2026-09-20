@@ -10,6 +10,7 @@
   --muted: #8a8a8a;
   --line: #d4d4d4;
   --fill: #e4e4e4;
+  --stage: #f1f1f1;
   --shadow: none;
   color-scheme: light;
 
@@ -27,6 +28,7 @@
   --muted: #8a8a8a;
   --line: #2e2e2e;
   --fill: #1a1a1a;
+  --stage: #121212;
   color-scheme: dark;
 }
 
@@ -223,26 +225,28 @@ h1, h2, h3, p, dl, dd, dt { margin: 0; }
 /* -------------------------------------------------------------- páginas */
 .page { padding: calc(var(--gutter) * 1.2) var(--gutter) 0; }
 .page .t-display { margin-bottom: clamp(60px, 22vh, 260px); }
+/* En la foto, la descripción va bajo el título y el gran espacio queda entre ella y la ficha */
+.page .t-display + .photo__desc { margin-top: calc(clamp(60px, 22vh, 260px) * -1 + 32px); margin-bottom: clamp(60px, 22vh, 260px); }
 .page .t-display + .meta { margin-top: 0; }
 .page__meta { display: grid; gap: 18px; margin-bottom: 24px; }
 
-/* Foto */
-.photo__stage { margin: 0 0 18px; }
-.photo__stage img { width: 100%; height: auto; opacity: 0; transition: opacity 1s ease; }
+/* Foto: centrada sobre un bloque gris muy claro */
+.photo__stage { margin: 0 0 18px; background: var(--stage); padding: clamp(16px, 4vw, 64px); display: grid; place-items: center; }
+.photo__stage img { display: block; width: auto; max-width: 100%; height: auto; max-height: 82vh; opacity: 0; transition: opacity 1s ease; }
 .photo__stage img.is-loaded { opacity: 1; }
-.photo__stage--portrait { max-width: min(680px, 78%); margin-inline: auto; }
 /* Carrusel foto / montaje en pared */
-.carousel { position: relative; display: grid; background: transparent; }
+.carousel { position: relative; display: grid; background: var(--stage); }
 .carousel__slide { grid-area: 1 / 1; transition: opacity 0.5s ease; }
 .carousel__slide:not(.is-active) { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
 .carousel__slide img { display: block; width: auto; max-width: 100%; height: auto; max-height: 82vh; margin-inline: auto; }
+.carousel__slide:not(.is-active) { padding: 0; }
+.carousel .carousel__zone { top: 0; bottom: 0; }
 .carousel__zone { position: absolute; top: 0; bottom: 0; width: 50%; z-index: 2; background: none; border: 0; padding: 0; }
 .carousel__zone--prev { left: 0; cursor: w-resize; }
 .carousel__zone--next { right: 0; cursor: e-resize; }
 .carousel__zone[hidden] { display: none; }
 .carousel__zone:focus-visible { outline: 1px solid var(--ink); outline-offset: -4px; }
 .carousel__meta { padding-top: 12px; color: var(--muted); }
-.photo__desc { margin: 36px 0 0; }
 .photo__nav { display: flex; justify-content: space-between; gap: 24px; padding: 18px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-top: 48px; }
 .map { margin-top: 48px; }
 .map__canvas { aspect-ratio: 16 / 9; background: var(--fill); border: 1px solid var(--line); position: relative; overflow: hidden; filter: grayscale(1) contrast(1.05); }
@@ -398,6 +402,7 @@ h1, h2, h3, p, dl, dd, dt { margin: 0; }
 /* ------------------------------------------------------------ responsive */
 @media (max-width: 900px) {
   .grid { grid-template-columns: repeat(2, 1fr); }
+  .map .row--kv { flex-direction: column; gap: 4px; }
   .info { grid-template-columns: 1fr; }
   .info__block--right { text-align: left; grid-template-columns: max-content 1fr; }
   .form__row { grid-template-columns: 1fr; }
