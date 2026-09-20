@@ -78,7 +78,7 @@ Los tamaños de copia por defecto están en Settings → Default print sizes (an
 
 ## Mapa
 
-Usa [Leaflet](https://leafletjs.com) con teselas de CARTO/OpenStreetMap, sin clave de API. Si una foto no tiene `location.lat` y `location.lng`, simplemente no se muestra el mapa.
+Usa [Leaflet](https://leafletjs.com) con el mapa gris claro de Esri (sin clave de API) y OpenStreetMap como reserva automática si el primero falla. Si una foto no tiene `location.lat` y `location.lng`, simplemente no se muestra el mapa.
 
 ## Publicación
 

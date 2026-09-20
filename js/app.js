@@ -622,10 +622,24 @@
       if (!document.body.contains(el)) return;
       el.innerHTML = "";
       const map = L.map(el, { scrollWheelZoom: false }).setView([lat, lng], 9);
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-        maxZoom: 18,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-      }).addTo(map);
+      // Proveedores de teselas sin clave de API. Si el primero falla, se pasa al siguiente.
+      const providers = [
+        { url: "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", maxZoom: 16,
+          attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ' },
+        { url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", maxZoom: 19,
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }
+      ];
+      let layer = null;
+      const useProvider = (k) => {
+        if (k >= providers.length) return;
+        if (layer) map.removeLayer(layer);
+        const prov = providers[k];
+        let failed = 0;
+        layer = L.tileLayer(prov.url, { maxZoom: prov.maxZoom, attribution: prov.attribution });
+        layer.on("tileerror", () => { failed += 1; if (failed === 3) useProvider(k + 1); });
+        layer.addTo(map);
+      };
+      useProvider(0);
       const icon = L.divIcon({ className: "", html: '<div class="map__pin"></div>', iconSize: [12, 12], iconAnchor: [6, 6] });
       L.marker([lat, lng], { icon, title: name }).addTo(map);
       setTimeout(() => map.invalidateSize(), 300);
