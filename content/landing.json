@@ -1,0 +1,19 @@
+{
+  "domain": "",
+  "name": "Emilio García",
+  "role": "Photography · Madrid",
+  "intro": "Landscape, moon, drone and night photography. Limited-edition prints and small-group workshops. This is my corner of the internet.",
+  "facts": [
+    { "label": "Based in", "value": "Spain, Madrid" },
+    { "label": "Doing", "value": "Photography, prints and workshops" },
+    { "label": "Currently", "value": "Available for commissions" },
+    { "label": "Since", "value": "2018" }
+  ],
+  "links": [
+    { "label": "Photos", "url": "photos/" },
+    { "label": "Instagram", "url": "https://www.instagram.com/piensaenpixel/" },
+    { "label": "Unsplash", "url": "https://unsplash.com/@piensaenpixel" }
+  ],
+  "email": "piensaenpixel@gmail.com",
+  "cv": ""
+}

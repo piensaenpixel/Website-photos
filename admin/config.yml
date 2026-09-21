@@ -10,8 +10,8 @@ backend:
   # URL del servicio de login (sveltia-cms-auth en Cloudflare Workers).
   base_url: https://sveltia-cms-auth.piensaenpixel.workers.dev
 
-site_url: https://piensaenpixel.github.io/Website-photos/staging/
-display_url: https://piensaenpixel.github.io/Website-photos/staging/
+site_url: https://piensaenpixel.github.io/Website-photos/staging/photos/
+display_url: https://piensaenpixel.github.io/Website-photos/staging/photos/
 logo_url: https://piensaenpixel.github.io/Website-photos/img/favicon.svg
 
 media_folder: img/fotos
@@ -118,8 +118,33 @@ collections:
   - name: settings
     label: Settings
     files:
+      - name: landing
+        label: Home page (piensaenpixel.es)
+        file: content/landing.json
+        fields:
+          - { name: domain, label: Custom domain, widget: string, required: false, hint: "e.g. piensaenpixel.es. Leave empty until the DNS records point to GitHub." }
+          - { name: name, label: Name, widget: string }
+          - { name: role, label: Role / tagline, widget: string, required: false }
+          - { name: intro, label: Intro, widget: text, required: false }
+          - name: facts
+            label: Key facts
+            widget: list
+            required: false
+            fields:
+              - { name: label, label: Label, widget: string }
+              - { name: value, label: Value, widget: string }
+          - name: links
+            label: Links
+            widget: list
+            required: false
+            hint: "Use photos/ for the photo portfolio"
+            fields:
+              - { name: label, label: Label, widget: string }
+              - { name: url, label: URL, widget: string }
+          - { name: email, label: Email, widget: string, required: false }
+          - { name: cv, label: CV (PDF), widget: file, required: false, media_folder: img, public_folder: img }
       - name: site
-        label: Site
+        label: Photo site
         file: content/site.json
         fields:
           - { name: name, label: Site name, widget: string }

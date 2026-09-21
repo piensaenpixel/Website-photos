@@ -1,6 +1,6 @@
 # Publica la web en GitHub Pages (rama gh-pages):
-#   - la rama main      → https://piensaenpixel.github.io/Website-photos/
-#   - la rama staging   → https://piensaenpixel.github.io/Website-photos/staging/
+#   - la rama main      → raíz: portada personal, y el portfolio en /photos/
+#   - la rama staging   → lo mismo bajo /staging/
 # Se ejecuta con cada push a main o staging, y también a mano.
 name: Publicar en GitHub Pages
 

@@ -15,6 +15,13 @@ Portfolio fotográfico estático (HTML, CSS y JavaScript sin dependencias ni bui
 - Panel de administración en `/admin` (Sveltia CMS) y web de staging en `/staging/`.
 - Toda la interfaz está en inglés. Navegación por hash (`#/gallery/moon`, `#/photo/id`...), así que funciona en GitHub Pages sin configuración extra.
 
+## Estructura publicada
+
+- `piensaenpixel.es/` (o `piensaenpixel.github.io/Website-photos/` mientras no apunte el dominio): portada personal, generada de `content/landing.json` (editable en el panel: Settings → Home page).
+- `/photos/`: el portfolio fotográfico.
+- `/staging/` y `/staging/photos/`: lo mismo con los cambios pendientes de publicar.
+- El dominio se activa poniendo `piensaenpixel.es` en Settings → Home page → Custom domain (genera el archivo CNAME al publicar). Antes hay que crear los registros DNS en el proveedor del dominio: cuatro registros A para `piensaenpixel.es` a 185.199.108.153, 185.199.109.153, 185.199.110.153 y 185.199.111.153, y un CNAME de `www` a `piensaenpixel.github.io`.
+
 ## Cómo se gestiona el contenido
 
 Todo el contenido vive en la carpeta `content/`, en archivos JSON pequeños que edita el panel de administración:
@@ -31,11 +38,11 @@ Al publicar, el script `scripts/build_data.py` junta esos archivos en `js/data.j
 
 ## Panel de administración (CMS)
 
-El panel está en **https://piensaenpixel.github.io/Website-photos/admin/** y usa [Sveltia CMS](https://github.com/sveltia/sveltia-cms). Entras con tu cuenta de GitHub y editas fotos, series, cursos y ajustes con formularios; al guardar, hace el commit en la rama `staging`.
+El panel está en **https://piensaenpixel.github.io/Website-photos/photos/admin/** (con el dominio, `https://piensaenpixel.es/photos/admin/`) y usa [Sveltia CMS](https://github.com/sveltia/sveltia-cms). Entras con tu cuenta de GitHub y editas fotos, series, cursos y ajustes con formularios; al guardar, hace el commit en la rama `staging`.
 
 **Flujo de trabajo**
 
-1. Editas en el panel → se guarda en `staging` → en un par de minutos lo ves en **https://piensaenpixel.github.io/Website-photos/staging/** (lleva la marca «Staging» en la barra y los buscadores no la indexan).
+1. Editas en el panel → se guarda en `staging` → en un par de minutos lo ves en **https://piensaenpixel.github.io/Website-photos/staging/photos/** (lleva la marca «Staging» en la barra y los buscadores no la indexan).
 2. Cuando te guste, publicas: en GitHub, pestaña **Actions → «Publicar staging en la web» → Run workflow**. Eso pasa los cambios a `main` y regenera la web pública.
 
 **Configuración inicial (una sola vez, unos 10 minutos)**
