@@ -84,20 +84,33 @@ landing = read_json(os.path.join(SRC, "content", "landing.json"), {})
 site = read_json(os.path.join(SRC, "content", "site.json"), {})
 e = html.escape
 name = landing.get("name") or site.get("author") or "piensaenpixel"
-links = list(landing.get("links") or [])
-if landing.get("email"):
-    links.append({"label": "Email", "url": "mailto:" + landing["email"]})
+email = landing.get("email") or site.get("email") or ""
+
+def ext_attrs(url):
+    return 'href="%s"%s' % (e(url), ' target="_blank" rel="noopener"' if url.startswith("http") else "")
+
+links = []
+if email:
+    links.append(("Email", "mailto:" + email))
+if landing.get("linkedin"):
+    links.append(("LinkedIn", landing["linkedin"]))
+links.append(("Photos", "photos/"))
 if landing.get("cv"):
     cv = landing["cv"]
-    links.append({"label": "CV", "url": ("photos/" + cv) if not cv.startswith(("http", "/")) else cv})
+    links.append(("CV (PDF)", cv if cv.startswith(("http", "/")) else "photos/" + cv))
+links_html = " · ".join('<a %s>%s</a>' % (ext_attrs(u), e(l)) for l, u in links)
 
-def link_attrs(url):
-    ext = url.startswith("http")
-    return 'href="%s"%s' % (e(url), ' target="_blank" rel="noopener"' if ext else "")
-
-facts_html = "".join("<dt>%s:</dt><dd>%s</dd>" % (e(f.get("label", "")), e(f.get("value", ""))) for f in landing.get("facts") or [] if f.get("value"))
-links_html = "".join('<a class="ln" %s><span>%s</span><span>→</span></a>' % (link_attrs(l["url"]), e(l["label"])) for l in links if l.get("url"))
-nav_html = '<a href="photos/">Photos</a>'
+def job_html(j):
+    dates = e(j.get("from", "")) + (" — " + e(j["to"]) if j.get("to") else "")
+    return (
+        '<article class="job">'
+        '<div class="job__when">' + dates + (("<br>" + e(j["place"])) if j.get("place") else "") + "</div>"
+        '<div class="job__what"><h3>' + e(j.get("title", "")) + "</h3>"
+        + (('<p class="job__co">' + e(j["company"]) + "</p>") if j.get("company") else "")
+        + (('<p class="job__desc">' + e(j["description"]) + "</p>") if j.get("description") else "")
+        + "</div></article>"
+    )
+experience_html = "".join(job_html(j) for j in landing.get("experience") or [])
 words = " ".join('<span class="w"><span class="w__i" style="--d:%dms">%s</span></span>' % (i * 70, e(w)) for i, w in enumerate(name.split()))
 
 landing_html = """<!DOCTYPE html>
@@ -105,74 +118,79 @@ landing_html = """<!DOCTYPE html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>%(name)s — piensaenpixel</title>
+  <title>%(name)s — %(role)s</title>
   <meta name="description" content="%(intro)s">
   <meta name="theme-color" content="#ffffff">%(robots)s
   <link rel="icon" href="photos/img/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@500;700;800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700;800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root { --bg: #fff; --ink: #000; --muted: #8a8a8a; --line: #d4d4d4; --gutter: clamp(20px, 2.6vw, 40px); --bar-h: 56px; --ease: cubic-bezier(0.22, 1, 0.36, 1); }
-    @media (prefers-color-scheme: dark) { :root { --bg: #000; --ink: #fff; --line: #2e2e2e; } }
+    :root { --bg: #fff; --ink: #000; --muted: #6f6f6f; --line: #d4d4d4; --gutter: clamp(20px, 2.6vw, 40px); --bar-h: 56px; --ease: cubic-bezier(0.22, 1, 0.36, 1); }
+    @media (prefers-color-scheme: dark) { :root { --bg: #000; --ink: #fff; --muted: #9a9a9a; --line: #2e2e2e; } }
     *, *::before, *::after { box-sizing: border-box; }
     html { background: var(--bg); color: var(--ink); }
-    body { margin: 0; min-height: 100svh; font-family: "Geist Mono", "JetBrains Mono", Menlo, monospace; font-size: 14px; line-height: 1.5; text-transform: uppercase; background: var(--bg); color: var(--ink); padding: calc(var(--gutter) * 1.2) var(--gutter) calc(var(--bar-h) + 24px); display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; }
+    body { margin: 0; min-height: 100svh; font-family: "Geist", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 16px; line-height: 1.5; background: var(--bg); color: var(--ink); padding: calc(var(--gutter) * 1.2) var(--gutter) calc(var(--bar-h) + 32px); -webkit-font-smoothing: antialiased; }
     a { color: inherit; text-decoration: none; }
+    .mono { font-family: "Geist Mono", "JetBrains Mono", Menlo, monospace; font-size: 13px; text-transform: uppercase; }
     .top { display: flex; justify-content: space-between; gap: 24px; }
-    .top nav { display: flex; gap: 24px; }
-    .top a { position: relative; }
-    .top a::after, .bar a::after { content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: right; transition: transform 0.45s var(--ease); }
-    .top a:hover::after, .bar a:hover::after { transform: scaleX(1); transform-origin: left; }
-    main { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: clamp(48px, 10vh, 120px) 0; }
-    h1 { margin: 0; font-family: "Geist", "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: 700; font-size: clamp(52px, 9.5vw, 150px); line-height: 0.92; letter-spacing: -0.035em; text-transform: uppercase; }
+    .top a, .bar a, .links a { position: relative; }
+    .top a::after, .bar a::after, .links a::after { content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: right; transition: transform 0.45s var(--ease); }
+    .top a:hover::after, .bar a:hover::after, .links a:hover::after { transform: scaleX(1); transform-origin: left; }
+    main { max-width: 860px; padding: clamp(56px, 12vh, 140px) 0 0; }
+    h1 { margin: 0; font-weight: 700; font-size: clamp(44px, 7vw, 96px); line-height: 0.95; letter-spacing: -0.035em; text-transform: uppercase; }
     .w { display: inline-block; overflow: hidden; vertical-align: bottom; padding: 0.04em 0.04em 0.1em 0.02em; margin: -0.04em -0.04em -0.1em -0.02em; }
     .w__i { display: inline-block; transform: translateY(110%%); animation: up 1s var(--ease) forwards; animation-delay: var(--d, 0ms); }
     @keyframes up { to { transform: none; } }
-    .role { margin: 18px 0 0; color: var(--muted); }
-    .intro { max-width: 70ch; margin: 40px 0 0; line-height: 1.55; }
-    .facts { display: grid; grid-template-columns: max-content 1fr; column-gap: 20px; margin: clamp(48px, 8vh, 96px) 0 0; }
-    .facts dt, .facts dd { margin: 0; }
-    .facts dd { text-align: right; }
-    .links { display: grid; margin: clamp(48px, 8vh, 96px) 0 0; border-top: 1px solid var(--line); }
-    .ln { display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--line); transition: padding-left 0.5s var(--ease); }
-    .ln:hover { padding-left: 12px; }
+    .role { margin: 20px 0 0; font-size: 18px; }
+    .links { margin: 12px 0 0; color: var(--muted); }
+    .links a { color: var(--ink); }
+    hr { border: 0; border-top: 1px solid var(--ink); margin: 36px 0; }
+    .intro { max-width: 62ch; margin: 0; font-size: 17px; line-height: 1.55; }
+    .exp { margin: clamp(48px, 8vh, 80px) 0 0; }
+    .exp h2 { margin: 0 0 8px; font-weight: 400; color: var(--muted); }
+    .job { display: grid; grid-template-columns: 180px 1fr; gap: 24px; padding: 22px 0; border-top: 1px solid var(--line); }
+    .job:last-child { border-bottom: 1px solid var(--line); }
+    .job__when { color: var(--muted); line-height: 1.6; }
+    .job h3 { margin: 0; font-size: 18px; font-weight: 700; line-height: 1.3; }
+    .job__co { margin: 2px 0 0; color: var(--muted); }
+    .job__desc { margin: 10px 0 0; max-width: 60ch; }
     .fade { opacity: 0; animation: fade 1s var(--ease) forwards; }
-    .fade:nth-of-type(2) { animation-delay: 0.15s; } .fade:nth-of-type(3) { animation-delay: 0.3s; } .fade:nth-of-type(4) { animation-delay: 0.45s; } .fade:nth-of-type(5) { animation-delay: 0.6s; }
+    .fade:nth-of-type(2) { animation-delay: 0.1s; } .fade:nth-of-type(3) { animation-delay: 0.2s; } .fade:nth-of-type(4) { animation-delay: 0.3s; } .fade:nth-of-type(5) { animation-delay: 0.4s; } .fade:nth-of-type(6) { animation-delay: 0.5s; }
     @keyframes fade { to { opacity: 1; } }
     .bar { position: fixed; left: 0; right: 0; bottom: 0; height: var(--bar-h); display: flex; justify-content: space-between; align-items: center; padding-inline: var(--gutter); mix-blend-mode: difference; color: #fff; }
-    .bar a { position: relative; }
     :root[data-env="staging"] .bar span::before { content: "Staging · "; }
-    @media (min-width: 901px) { .facts { grid-template-columns: minmax(13ch, max-content) max-content; } .facts dd { text-align: left; } }
+    @media (max-width: 640px) { .job { grid-template-columns: 1fr; gap: 6px; } }
     @media (prefers-reduced-motion: reduce) { .w__i, .fade { animation: none; transform: none; opacity: 1; } }
   </style>
 </head>
 <body>
-  <header class="top">
+  <header class="top mono">
     <a href="./">piensaenpixel</a>
-    <nav>%(nav)s</nav>
+    <nav><a href="photos/">Photos</a></nav>
   </header>
   <main>
     <h1>%(words)s</h1>
     %(role)s
+    <p class="links mono fade">%(links)s</p>
+    <hr class="fade">
     %(intro_p)s
-    %(facts)s
-    <nav class="links fade">%(links)s</nav>
+    %(experience)s
   </main>
-  <div class="bar"><span>©%(year)s piensaenpixel</span><a href="photos/">Photos</a></div>
+  <div class="bar mono"><span>©%(year)s piensaenpixel</span><a href="photos/">Photos →</a></div>
 </body>
 </html>
 """ % {
     "env": ' data-env="staging"' if STAGING else "",
     "name": e(name),
+    "role": e(landing.get("role", "")),
     "intro": e(landing.get("intro", "")),
     "robots": '\n  <meta name="robots" content="noindex, nofollow">' if STAGING else "",
-    "nav": nav_html,
     "words": words,
     "role": ('<p class="role fade">%s</p>' % e(landing["role"])) if landing.get("role") else "",
-    "intro_p": ('<p class="intro fade">%s</p>' % e(landing["intro"])) if landing.get("intro") else "",
-    "facts": ('<dl class="facts fade">%s</dl>' % facts_html) if facts_html else "",
     "links": links_html,
+    "intro_p": ('<p class="intro fade">%s</p>' % e(landing["intro"])) if landing.get("intro") else "",
+    "experience": ('<section class="exp fade"><h2 class="mono">Experience</h2>%s</section>' % experience_html) if experience_html else "",
     "year": __import__("datetime").date.today().year,
 }
 with open(os.path.join(DEST, "index.html"), "w", encoding="utf-8") as f:

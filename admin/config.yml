@@ -124,25 +124,23 @@ collections:
         fields:
           - { name: domain, label: Custom domain, widget: string, required: false, hint: "e.g. piensaenpixel.es. Leave empty until the DNS records point to GitHub." }
           - { name: name, label: Name, widget: string }
-          - { name: role, label: Role / tagline, widget: string, required: false }
-          - { name: intro, label: Intro, widget: text, required: false }
-          - name: facts
-            label: Key facts
-            widget: list
-            required: false
-            fields:
-              - { name: label, label: Label, widget: string }
-              - { name: value, label: Value, widget: string }
-          - name: links
-            label: Links
-            widget: list
-            required: false
-            hint: "Use photos/ for the photo portfolio"
-            fields:
-              - { name: label, label: Label, widget: string }
-              - { name: url, label: URL, widget: string }
+          - { name: role, label: Role · place, widget: string, required: false, hint: "e.g. Director of Product Design · Madrid, Spain" }
+          - { name: intro, label: Summary, widget: text, required: false }
           - { name: email, label: Email, widget: string, required: false }
-          - { name: cv, label: CV (PDF), widget: file, required: false, media_folder: img, public_folder: img }
+          - { name: linkedin, label: LinkedIn URL, widget: string, required: false }
+          - { name: cv, label: CV (PDF), widget: file, required: false, media_folder: img, public_folder: img, hint: "Optional. Adds a CV link that opens the PDF." }
+          - name: experience
+            label: Experience
+            widget: list
+            required: false
+            summary: "{{fields.title}} — {{fields.company}}"
+            fields:
+              - { name: from, label: From, widget: string, hint: "e.g. Sep 2025" }
+              - { name: to, label: To, widget: string, hint: "e.g. Now" }
+              - { name: place, label: Place, widget: string, required: false }
+              - { name: title, label: Title, widget: string }
+              - { name: company, label: Company, widget: string }
+              - { name: description, label: Description, widget: text, required: false }
       - name: site
         label: Photo site
         file: content/site.json
