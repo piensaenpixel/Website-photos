@@ -2,7 +2,7 @@
 
 Portfolio fotográfico estático (HTML, CSS y JavaScript sin dependencias ni build) pensado para publicarse en GitHub Pages.
 
-**Web:** https://piensaenpixel.github.io/Website-photos/
+**Web:** https://piensaenpixel.github.io/personal/
 
 ## Qué tiene
 
@@ -17,7 +17,7 @@ Portfolio fotográfico estático (HTML, CSS y JavaScript sin dependencias ni bui
 
 ## Estructura publicada
 
-- `piensaenpixel.es/` (o `piensaenpixel.github.io/Website-photos/` mientras no apunte el dominio): portada personal, generada de `content/landing.json` (editable en el panel: Settings → Home page).
+- `piensaenpixel.es/` (o `piensaenpixel.github.io/personal/` mientras no apunte el dominio): portada personal, generada de `content/landing.json` (editable en el panel: Settings → Home page).
 - `/photos/`: el portfolio fotográfico.
 - `/staging/` y `/staging/photos/`: lo mismo con los cambios pendientes de publicar.
 - El dominio se activa poniendo `piensaenpixel.es` en Settings → Home page → Custom domain (genera el archivo CNAME al publicar). Antes hay que crear los registros DNS en el proveedor del dominio: cuatro registros A para `piensaenpixel.es` a 185.199.108.153, 185.199.109.153, 185.199.110.153 y 185.199.111.153, y un CNAME de `www` a `piensaenpixel.github.io`.
@@ -38,11 +38,11 @@ Al publicar, el script `scripts/build_data.py` junta esos archivos en `js/data.j
 
 ## Panel de administración (CMS)
 
-El panel está en **https://piensaenpixel.github.io/Website-photos/photos/admin/** (con el dominio, `https://piensaenpixel.es/photos/admin/`) y usa [Sveltia CMS](https://github.com/sveltia/sveltia-cms). Entras con tu cuenta de GitHub y editas fotos, series, cursos y ajustes con formularios; al guardar, hace el commit en la rama `staging`.
+El panel está en **https://piensaenpixel.github.io/personal/photos/admin/** (con el dominio, `https://piensaenpixel.es/photos/admin/`) y usa [Sveltia CMS](https://github.com/sveltia/sveltia-cms). Entras con tu cuenta de GitHub y editas fotos, series, cursos y ajustes con formularios; al guardar, hace el commit en la rama `staging`.
 
 **Flujo de trabajo**
 
-1. Editas en el panel → se guarda en `staging` → en un par de minutos lo ves en **https://piensaenpixel.github.io/Website-photos/staging/photos/** (lleva la marca «Staging» en la barra y los buscadores no la indexan).
+1. Editas en el panel → se guarda en `staging` → en un par de minutos lo ves en **https://piensaenpixel.github.io/personal/staging/photos/** (lleva la marca «Staging» en la barra y los buscadores no la indexan).
 2. Cuando te guste, publicas: en GitHub, pestaña **Actions → «Publicar staging en la web» → Run workflow**. Eso pasa los cambios a `main` y regenera la web pública.
 
 **Configuración inicial (una sola vez, unos 10 minutos)**
@@ -53,7 +53,7 @@ El panel necesita un pequeño servicio de login para GitHub. Es gratuito:
 2. Entra en https://github.com/sveltia/sveltia-cms-auth y pulsa el botón **Deploy to Cloudflare Workers**. Al terminar tendrás una URL del tipo `https://sveltia-cms-auth.TU-USUARIO.workers.dev`.
 3. En GitHub: **Settings → Developer settings → OAuth Apps → New OAuth App**. Rellena:
    - Application name: `piensaenpixel admin`
-   - Homepage URL: `https://piensaenpixel.github.io/Website-photos/`
+   - Homepage URL: `https://piensaenpixel.github.io/personal/`
    - Authorization callback URL: `https://sveltia-cms-auth.TU-USUARIO.workers.dev/callback`
    Guarda, copia el **Client ID** y genera un **Client secret** (cópialo también).
 4. En Cloudflare, abre el worker → **Settings → Variables and Secrets** y añade:
@@ -62,7 +62,7 @@ El panel necesita un pequeño servicio de login para GitHub. Es gratuito:
    - `ALLOWED_DOMAINS` = `piensaenpixel.github.io`
 5. La URL del worker (`https://sveltia-cms-auth.piensaenpixel.workers.dev`) ya está en `admin/config.yml`.
 
-A partir de ahí, https://piensaenpixel.github.io/Website-photos/admin/ te pedirá entrar con GitHub y ya está.
+A partir de ahí, https://piensaenpixel.github.io/personal/admin/ te pedirá entrar con GitHub y ya está.
 
 ## Importar fotos desde Unsplash
 
