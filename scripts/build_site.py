@@ -94,7 +94,6 @@ if email:
     links.append(("Email", "mailto:" + email))
 if landing.get("linkedin"):
     links.append(("LinkedIn", landing["linkedin"]))
-links.append(("Photos", "photos/"))
 if landing.get("cv"):
     cv = landing["cv"]
     links.append(("CV (PDF)", cv if cv.startswith(("http", "/")) else "photos/" + cv))
@@ -158,7 +157,8 @@ landing_html = """<!DOCTYPE html>
     .fade { opacity: 0; animation: fade 1s var(--ease) forwards; }
     .fade:nth-of-type(2) { animation-delay: 0.1s; } .fade:nth-of-type(3) { animation-delay: 0.2s; } .fade:nth-of-type(4) { animation-delay: 0.3s; } .fade:nth-of-type(5) { animation-delay: 0.4s; } .fade:nth-of-type(6) { animation-delay: 0.5s; }
     @keyframes fade { to { opacity: 1; } }
-    .bar { position: fixed; left: 0; right: 0; bottom: 0; height: var(--bar-h); display: flex; justify-content: space-between; align-items: center; padding-inline: var(--gutter); mix-blend-mode: difference; color: #fff; }
+    .bar { position: fixed; left: 0; right: 0; bottom: 0; height: calc(var(--bar-h) + 56px); display: flex; justify-content: space-between; align-items: flex-end; padding: 0 var(--gutter) calc((var(--bar-h) - 20px) / 2); color: var(--ink); pointer-events: none; background: linear-gradient(to top, var(--bg) 0%%, var(--bg) var(--bar-h), transparent 100%%); }
+    .bar > * { pointer-events: auto; line-height: 20px; }
     :root[data-env="staging"] .bar span::before { content: "Staging · "; }
     @media (max-width: 640px) { .job { grid-template-columns: 1fr; gap: 6px; } }
     @media (prefers-reduced-motion: reduce) { .w__i, .fade { animation: none; transform: none; opacity: 1; } }
@@ -167,7 +167,6 @@ landing_html = """<!DOCTYPE html>
 <body>
   <header class="top mono">
     <a href="./">piensaenpixel</a>
-    <nav><a href="photos/">Photos</a></nav>
   </header>
   <main>
     <h1>%(words)s</h1>
