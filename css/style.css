@@ -23,12 +23,13 @@
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 }
 :root[data-theme="dark"] {
-  --bg: #000000;
-  --ink: #ffffff;
-  --muted: #8a8a8a;
-  --line: #2e2e2e;
-  --fill: #1a1a1a;
-  --stage: #121212;
+  /* Dark mode: dark grey instead of pure black, off-white text (less contrast fatigue). */
+  --bg: #121212;
+  --ink: #e8e8e8;
+  --muted: #8f8f8f;
+  --line: #2c2c2c;
+  --fill: #1f1f1f;
+  --stage: #1a1a1a;
   color-scheme: dark;
 }
 
@@ -347,6 +348,8 @@ h1, h2, h3, p, dl, dd, dt { margin: 0; }
 .menu__row:last-child { text-align: right; grid-template-columns: 1fr max-content; }
 .menu__row:last-child > span:first-child { text-align: left; }
 .menu__row a, .menu__theme { text-decoration: underline; text-underline-offset: 3px; }
+/* Theme selector hidden for now (kept in the markup and JS while we decide whether it stays). */
+.menu__row.menu__row--theme { display: none; }
 
 /* ------------------------------------------------------ apariciones */
 .sr { opacity: 0; transform: translateY(26px); transition: opacity 0.9s var(--ease), transform 1.1s var(--ease); transition-delay: calc(var(--i, 0) * 80ms); }

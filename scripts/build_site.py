@@ -126,7 +126,7 @@ landing_html = """<!DOCTYPE html>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700;800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root { --bg: #fff; --ink: #000; --muted: #6f6f6f; --line: #d4d4d4; --gutter: clamp(20px, 2.6vw, 40px); --bar-h: 56px; --ease: cubic-bezier(0.22, 1, 0.36, 1); }
-    @media (prefers-color-scheme: dark) { :root { --bg: #000; --ink: #fff; --muted: #9a9a9a; --line: #2e2e2e; } }
+    @media (prefers-color-scheme: dark) { :root { --bg: #121212; --ink: #e8e8e8; --muted: #8f8f8f; --line: #2c2c2c; } }
     *, *::before, *::after { box-sizing: border-box; }
     html { background: var(--bg); color: var(--ink); }
     body { margin: 0; min-height: 100svh; font-family: "Geist", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 16px; line-height: 1.5; background: var(--bg); color: var(--ink); padding: calc(var(--gutter) * 1.2) var(--gutter) calc(var(--bar-h) + 32px); -webkit-font-smoothing: antialiased; }
